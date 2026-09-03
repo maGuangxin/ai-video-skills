@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/project-config.schema.json",
+  "title": "AI Video Project Base Config (12 questions answered by agent-guided interview)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "entryType",
+    "targetPlatform",
+    "aspectRatio",
+    "singleShotMaxSeconds",
+    "artStyle",
+    "voiceoverMode",
+    "characterRoster",
+    "sceneRoster",
+    "keyBeats",
+    "namingConvention",
+    "tempCleanupMode",
+    "projectRootAbsolutePath",
+    "projectSemanticName"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "entryType": {
+      "type": "string",
+      "enum": [
+        "full-source-novel",
+        "story-outline-only",
+        "chars-scenes-core-beat",
+        "single-shot-fragment",
+        "prebuilt-storyboard-lines",
+        "prebuilt-prompts-only-audit"
+      ],
+      "enumDescriptions": [
+        "① 完整故事原文（长篇小说/短篇完整剧情）",
+        "② 剧情大纲（多条剧情节点无完整原文）",
+        "③ 角色清单 + 场景清单 + 核心剧情爆点（1~N段）",
+        "④ 单段剧情片段（10~30秒，仅1段台词+动作）",
+        "⑤ 分镜脚本+台词时间轴已写好，只跑后续流程",
+        "⑥ 视频提示词已写好，只想做一致性校验+字幕TTS"
+      ]
+    },
+    "targetPlatform": {
+      "type": "string",
+      "enum": [
+        "doubao-standard-10s",
+        "jimeng-premium-20s",
+        "seedance-api-custom",
+        "other-platform-tbd"
+      ],
+      "description": "豆包端标准会员硬限制：单段锁死5s/10s二选一；即梦满血版支持20s；API支持自定义秒数"
+    },
+    "aspectRatio": {
+      "type": "string",
+      "enum": ["9:16-vertical", "16:9-horizontal", "1:1-square"]
+    },
+    "singleShotMaxSeconds": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 60,
+      "description": "单段视频硬上限秒数（豆包标准=10，即梦满血=20，API可自定义）"
+    },
+    "artStyle": {
+      "type": "string",
+      "enum": [
+        "cinematic-realistic-3d",
+        "semi-realistic-game-cg",
+        "us-cartoon",
+        "jp-anime",
+        "chinese-gufeng-handpaint",
+        "cyberpunk-neon",
+        "sci-fi-realistic",
+        "custom-style-define-below"
+      ]
+    },
+    "customStyleDefinition": {
+      "type": ["string", "null"],
+      "description": "当 artStyle=custom-style-define-below 时必填，其余情况留 null"
+    },
+    "voiceoverMode": {
+      "type": "string",
+      "enum": [
+        "tts-post-production",
+        "lip-sync-if-supported",
+        "subtitles-only-silent",
+        "no-dialogue-no-subtitles"
+      ]
+    },
+    "characterRoster": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "character.schema.json"
+      }
+    },
+    "sceneRoster": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "scene.schema.json"
+      }
+    },
+    "keyBeats": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["beatName", "mustNotSplitInMiddle"],
+        "properties": {
+          "beatName": { "type": "string" },
+          "mustNotSplitInMiddle": { "type": "boolean", "const": true }
+        }
+      },
+      "description": "核心爆点名场面（掀裙/圣光/召唤/告白等），拆分镜第一优先级：不允许在动作中间切段"
+    },
+    "namingConvention": {
+      "type": "string",
+      "enum": ["english-semantic", "mixed-cn-en-ids", "english-ids-only"],
+      "default": "english-semantic"
+    },
+    "tempCleanupMode": {
+      "type": "string",
+      "enum": ["per-stage-suggestion-list", "per-stage-reminder-only", "end-of-project-once"]
+    },
+    "projectRootAbsolutePath": {
+      "type": "string"
+    },
+    "projectSemanticName": {
+      "type": "string"
+    }
+  }
+}

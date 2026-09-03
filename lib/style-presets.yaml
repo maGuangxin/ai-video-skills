@@ -1,0 +1,203 @@
+presetsVersion: 1.0
+activationRulesDescription: &gt;
+  用户在 SK-0 配置阶段选择一个 artStyle，系统自动激活该风格对应的 3 大核心技术开关矩阵（写实3次夹攻/完整前缀强制复制/百分比特权锚点+家具锚点）。
+  矩阵中的 boolean=false 表示该风格不强制激活该技术（例如卡通风通常不强制家具真实厘米数），但用户仍可在 SK-0b 缺项引导中手动强制开启。
+
+presets:
+  cinematic-realistic-3d:
+    displayName: 电影级写实 3D（推荐默认，质量最高）
+    styleId: cinematic-realistic-3d
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: true
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: true
+      lipSync6pos7neg: true
+      sixNegativeBuckets: true
+    promptTemplates:
+      firstRealismPinchZh: |
+        超写实真人比例真实3D电影级CG渲染，8K IMAX Cinema分辨率细节拉满，Academy Award 级材质物理正确性，真人实拍级皮肤纹理毛孔+毛发次表面散射。
+      firstRealismPinchEn: |
+        Ultra-photorealistic cinematic 3D CGI render at 8K IMAX cinema resolution, Academy Award level physically correct materials, real human skin texture pores + hair/fur subsurface scattering.
+      secondMaterialRealismZh: |
+        材质物理属性严格真实：金属拉丝磨损反射率对应、织物经纬线纹理可辨、宝石色散折射、皮革毛孔折痕、木纹年轮，禁止卡通纯色平涂材质。
+      secondMaterialRealismEn: |
+        Physically accurate materials: brushed metal wear with correct IOR reflection, woven fabric thread-level texture, gem dispersion refraction, leather pores creases, wood growth rings, NO cartoon flat-solid-color materials.
+      thirdAntiFlatLightZh: |
+        灯光物理真实：三点布光主光45°+辅光柔光+背光轮廓光，色温真实（2700K暖/6500K冷），禁止无阴影无方向卡通平光 Ambient 100%。
+      thirdAntiFlatLightEn: |
+        Physically real lighting: 3-point key 45° + soft fill + rim/hair backlight, accurate CCT (2700K warm / 6500K cool), NO shadowless omnidirectional cartoon flat 100% ambient lighting.
+    negativeCartoonBucketEnabled: true
+    recommendedCinematicDefaults:
+      shotScaleDefault: MS (50mm standard, 80% dialogue scenes)
+      frameRateDefault: 24fps cinematic 180° shutter
+      colorGradingDefault: Teal & Orange Hollywood LUT
+
+  semi-realistic-game-cg:
+    displayName: 半写实游戏 CG（3A大作感）
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: partial
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: true
+      lipSync6pos7neg: true
+      sixNegativeBuckets: partial
+    promptTemplates:
+      firstRealismPinchZh: AAA级游戏过场动画CG渲染，Unreal Engine 5 Lumen Nanite 实时全局光照，半写实高多边形真实比例。
+      secondMaterialRealismZh: PBR 物理材质金属度/粗糙度/法线贴图全套细节，材质高保真。
+      thirdAntiFlatLightZh: UE5 Lumen 真实动态光照体积雾，禁止纯平光。
+    negativeCartoonBucketEnabled: true
+
+  us-cartoon:
+    displayName: 美式卡通（2D/Disney风格）
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: false
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: false
+      lipSync6pos7neg: true
+      sixNegativeBuckets: partial
+    promptTemplates:
+      firstRealismPinchZh: 经典美式2D手绘卡通渲染，迪士尼风格，干净清晰轮廓线明亮色块。
+    negativeCartoonBucketEnabled: false
+    alternativeNegativeBuckets:
+      cartoonStyling13: []
+
+  jp-anime:
+    displayName: 日系动漫（新番剧场版风格）
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: false
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: false
+      lipSync6pos7neg: true
+      sixNegativeBuckets: partial
+    promptTemplates:
+      firstRealismPinchZh: 日系新番剧场版高清2D动画渲染，赛璐璐上色+精致高光层次干净描边。
+    negativeCartoonBucketEnabled: false
+
+  chinese-gufeng-handpaint:
+    displayName: 古风手绘（水墨工笔国风）
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: false
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: false
+      lipSync6pos7neg: true
+      sixNegativeBuckets: partial
+    promptTemplates:
+      firstRealismPinchZh: 中国传统工笔重彩国风手绘，水墨晕染层次，宣纸质感绢本纹理工笔线条精细。
+    negativeCartoonBucketEnabled: false
+
+  cyberpunk-neon:
+    displayName: 赛博朋克霓虹
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: partial
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: true
+      lipSync6pos7neg: true
+      sixNegativeBuckets: partial
+    promptTemplates:
+      firstRealismPinchZh: 赛博朋克未来都市写实CG渲染，霓虹灯光+全息投影+雨地反射，高对比度品红青色调。
+      thirdAntiFlatLightZh: 霓虹多色局部光+体积光丁达尔效应+湿地面反射，禁止纯平光。
+    negativeCartoonBucketEnabled: true
+
+  sci-fi-realistic:
+    displayName: 科幻写实
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: true
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: true
+      lipSync6pos7neg: true
+      sixNegativeBuckets: true
+    promptTemplates:
+      firstRealismPinchZh: 硬科幻电影级写实CG渲染，ILM / Weta Digital 级物理材质VFX。
+    negativeCartoonBucketEnabled: true
+
+  custom-style-define-below:
+    displayName: 自定义风格（由 SK-0b 提问引导用户补充风格描述）
+    threeCoreTechniqueMatrix:
+      tripleRealismPinch: false
+      fullPrefixForcePaste: true
+      percentagePrivilegeAndFurnitureAnchors: false
+      lipSync6pos7neg: true
+      sixNegativeBuckets: partial
+    requiresUserExtraDefinition: true
+    negativeCartoonBucketEnabled: false
+
+universalLipSyncPositive6:
+  - mouth movement visible
+  - jaw movement natural
+  - natural lip-sync synchronized with dialogue
+  - lips animate while speaking
+  - expressive lip motion during lines
+  - mandible oscillation while pronouncing vowels
+universalLipSyncNegative7:
+  - static mouth frozen lips
+  - no mouth movement at all
+  - glued-together lips
+  - teeth permanently clenched never part
+  - expressionless mask-like face
+  - speaking lines without any lip animation
+  - non-matching lip flap
+
+sixNegativeBucketsTemplates:
+  lipSync7Template:
+    - static mouth
+    - frozen lips
+    - glued mouth
+    - expressionless mask face
+    - zero lip animation
+    - non-matching lip flap
+    - jaw never moves
+  cartoonStyling13Template:
+    - cartoon style
+    - anime illustration
+    - 2D flat art
+    - stylized non-realistic
+    - chibi big head
+    - simplified proportions
+    - thick outlines
+    - cel-shaded
+    - vector art
+    - comic book
+    - toon shader
+    - rendered cel shading
+    - doll/toy figurine
+  materialsTexture9Template:
+    - plastic-like skin
+    - rubber material
+    - flat solid color
+    - no fabric weave
+    - no metal reflection
+    - no gem refraction
+    - no leather pores
+    - no wood grain
+    - no sub-surface scattering
+  proportionPerspective9Template:
+    - extra large head
+    - compressed height difference
+    - tiny feet
+    - wrong furniture scale
+    - floating characters off ground
+    - perspective distortion
+    - vanishing point mismatch
+    - doors impossibly short
+    - hands too large or too small
+  characterDetails10Template:
+    - wrong hair color
+    - missing armor pieces
+    - gemstones wrong color
+    - swapped eye color
+    - extra fingers
+    - deformed face
+    - missing iconic equipment
+    - outfit color wrong
+    - gender switch
+    - race changed (e.g. gnome suddenly human)
+  basicCommon10Template:
+    - low resolution
+    - jpeg artifacts
+    - watermark
+    - text overlay
+    - blurry out of focus
+    - extra limbs
+    - duplicate characters
+    - bad anatomy
+    - nonsensical background
+    - logo or signature in corner

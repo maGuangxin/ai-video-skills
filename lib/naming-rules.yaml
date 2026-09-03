@@ -1,0 +1,88 @@
+rulesVersion: 1.0
+enforcement: strict
+allowFallback: false
+
+namingFormula:
+  directories: "[类别前缀]-[ID]-[语义化核心内容]"
+  files:       "[类别前缀]-[ID]-[语义化核心内容]-[可选版本号].[ext]"
+  versions:    "v01 / v02 / v03 ...两位数字，禁止使用文字版『最终』『新版』『真的不改了』"
+
+prefixDictionary:
+  storyboard: storyboard
+  shot: shot
+  character: char
+  scene: scene
+  videoPrompt: prompt-video
+  keyframe: kf
+  subtitles: sub
+  tts: tts
+  tutorial: tutorial
+  draft: tmp-draft
+  finalClip: final
+
+bannedWords:
+  - 新建文件夹
+  - 未命名
+  - 文本
+  - 图片
+  - 视频
+  - 最终
+  - 最终版
+  - 新版
+  - 真的不改了
+  - 新建文本文档
+  - final（版本号必须用 v01/v02）
+  - new（版本号必须用 v01/v02）
+
+directoryRules:
+  - category: storyboard
+    pattern: "^storyboard-[0-9]+-[A-Za-z0-9_-]+$"
+    exampleCorrect: storyboard-1-balcony-night-opening
+    exampleWrong: storyboard1 / 分镜1 / storyboard_new
+  - category: shot
+    pattern: "^shot-[0-9]+[A-Z]?-[A-Za-z0-9_-]+$"
+    exampleCorrect: shot-1A-balcony-taivy-wave
+    exampleWrong: 片段1A / shot1 / shot-new
+  - category: character
+    pattern: "^char-[A-Za-z0-9_-]+$"
+    exampleCorrect: char-taivy-gnome-warlock
+    exampleWrong: 塔薇 / character1
+  - category: scene
+    pattern: "^scene-[A-Za-z0-9_-]+$"
+    exampleCorrect: scene-dalaran-balcony-night
+    exampleWrong: 阳台夜景 / scene1
+
+fileRules:
+  - category: videoPrompt
+    fileName: "video-prompt.md"
+    scope: inside-a-shot-directory
+    note: 由于上级 shot 目录本身已带完整语义 ID+内容，提示词文件内部直接统一命名 video-prompt.md，避免冗余
+  - category: storyboardScript
+    fileName: "storyboard-script.md"
+    scope: inside-a-storyboard-directory
+  - category: keyframeConstraints
+    fileName: "keyframe-constraints.md"
+    scope: inside-a-storyboard-directory
+  - category: subtitles
+    pattern: "^sub-shot-[0-9]+[A-Z]?\\.srt$"
+    exampleCorrect: sub-shot-1A.srt / sub-shot-2.srt
+    exampleWrong: 字幕1.srt / subtitle.srt
+  - category: keyframes
+    pattern: "^kf-shot-[0-9]+[A-Z]?-(head|tail)-[A-Za-z0-9_-]+-v[0-9]{2}\\.(png|jpg|webp)$"
+    exampleCorrect: kf-shot-1A-head-balcony-taivy-v03.png
+    exampleWrong: 01.png / 首帧.jpg / 图片1.png
+  - category: finalVideo
+    pattern: "^final-shot-[0-9]+[A-Z]?-[A-Za-z0-9_-]+-v[0-9]{2}\\.(mp4|mov)$"
+    exampleCorrect: final-shot-1A-balcony-taivy-wave-v02.mp4
+    exampleWrong: final.mp4 / 视频1.mp4 / 未命名.mp4
+
+temporaryWorkspaceRules:
+  directory: 99_temporary-workspace
+  subDirectories:
+    - draft-versions
+    - storyboard-split-cache
+    - prompt-experimental
+  cleanupSuggestionHeader: |
+    # 临时文件删除建议清单（阶段：<STAGE_ID>）
+    # 本清单由 Skill 自动生成，仅供您参考。请手动确认后删除，Skill **不会自动删除任何文件**以防误删。
+    文件名 | 不再使用的原因 | 建议删除时间

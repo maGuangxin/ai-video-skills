@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/scene.schema.json",
+  "title": "Scene 5-item Anchor (cross-project minimum required fields)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "semanticNameEnglish",
+    "timeOfDay",
+    "keyFurnitureOrArchitectureList",
+    "lightingMoodPalette",
+    "emotionalTone"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^scene-[a-z0-9-]+$",
+      "examples": ["scene-dalaran-balcony-night", "scene-inn-room-warm"]
+    },
+    "semanticNameEnglish": { "type": "string" },
+    "timeOfDay": {
+      "type": "string",
+      "enum": ["dawn", "noon-daylight", "sunset-golden-hour", "dusk", "night", "magic-artificial"]
+    },
+    "keyFurnitureOrArchitectureList": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["name", "standardHeightCmIfApplicable", "relativePositionInRoom"],
+        "properties": {
+          "name": { "type": "string" },
+          "standardHeightCmIfApplicable": {
+            "type": ["integer", "null"],
+            "description": "写实风格家具真实高度：床=74、书桌=96、门把手=125、餐椅=45、厨房台面=92（来源于lib/cinematic-knowledge.yaml家具锚点库）"
+          },
+          "relativePositionInRoom": { "type": "string" }
+        }
+      }
+    },
+    "lightingMoodPalette": {
+      "type": "object",
+      "required": ["mainDirection", "cctK", "intensityRatio"],
+      "properties": {
+        "mainDirection": { "type": "string" },
+        "cctK": { "type": "integer" },
+        "intensityRatio": { "type": "string" }
+      }
+    },
+    "emotionalTone": {
+      "type": "string",
+      "examples": ["romantic-intimate", "terror-dark", "comedic-lighthearted", "epic-sacred", "mysterious"]
+    },
+    "shotRecommendations": {
+      "type": "object",
+      "properties": {
+        "establishingWide": { "type": "string" },
+        "midDialogue": { "type": "string" },
+        "emotionalCloseUp": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/storyboard.schema.json",
+  "title": "Storyboard + Shot (4D Alignment: Video / Action / Lip / TTS)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "storyboards"],
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "storyboards": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "semanticName", "shots"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^storyboard-[0-9]+$",
+            "examples": ["storyboard-1"]
+          },
+          "semanticName": { "type": "string" },
+          "shots": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/definitions/ShotItem"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ShotItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotId",
+        "semanticNameEnglish",
+        "durationSeconds",
+        "actionTimelineSeconds",
+        "lipSyncWindowSeconds",
+        "dialogueCharacters",
+        "dialogueRawText",
+        "ttsEstimateChars",
+        "ttsEstimateSecondsWordsPerSec",
+        "firstFrameMouthState",
+        "lastFrameMouthState"
+      ],
+      "properties": {
+        "shotId": {
+          "type": "string",
+          "pattern": "^shot-[0-9]+[A-Z]?$",
+          "examples": ["shot-1A", "shot-2"]
+        },
+        "semanticNameEnglish": { "type": "string" },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 60
+        },
+        "actionTimelineSeconds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["startSec", "endSec", "actionDescription"],
+            "properties": {
+              "startSec": { "type": "number", "minimum": 0 },
+              "endSec": { "type": "number", "minimum": 0 },
+              "actionDescription": { "type": "string" }
+            }
+          }
+        },
+        "lipSyncWindowSeconds": {
+          "type": "object",
+          "required": ["startSec", "endSec", "maxCharsAllowed"],
+          "properties": {
+            "startSec": { "type": "number", "minimum": 0 },
+            "endSec": { "type": "number", "minimum": 0 },
+            "maxCharsAllowed": {
+              "type": "integer",
+              "description": "口型窗口秒数 × 4字/秒 = 单段台词硬上限（32字默认10秒段，豆包端标准）"
+            }
+          }
+        },
+        "dialogueCharacters": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 0,
+          "description": "空数组=本片段无台词"
+        },
+        "dialogueRawText": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "单段台词原文，必须一字不跨段截断（拆分镜4原则2）"
+        },
+        "ttsEstimateChars": { "type": "integer" },
+        "ttsEstimateSecondsWordsPerSec": {
+          "type": "number",
+          "minimum": 3.0,
+          "maximum": 4.5,
+          "default": 4.0
+        },
+        "firstFrameMouthState": {
+          "type": "string",
+          "enum": ["closed-neutral", "opening-speaking", "smiling-closed", "teeth-showing"]
+        },
+        "lastFrameMouthState": {
+          "type": "string",
+          "enum": ["closed-neutral", "mid-word-hanging", "smiling-closed", "teeth-showing"]
+        }
+      }
+    }
+  }
+}

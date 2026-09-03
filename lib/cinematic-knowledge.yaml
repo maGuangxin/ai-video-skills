@@ -1,0 +1,201 @@
+knowledgeVersion: 1.0
+description: &gt;
+  通俗交互 → 专业电影术语映射层。用户全程回答「上半身/左边/暖光/电影感」这种人话，
+  Agent 内部自动把专业术语写入所有产物（提示词/分镜脚本/首尾帧约束/视觉规范），
+  用户完全不需要懂这些专业词汇，直接提升 AI 视频生成质量 30%+。
+
+shotScale:
+  userQuestion: "这段视频是拍整个人全身？还是上半身？还是只拍脸部？"
+  mapping:
+    "整个人从头到脚全身":
+      term: Extreme Long Shot / Wide Establishing
+      focal: 18mm - 24mm wide angle
+      aperture: f/8 - f/11 deep focus
+      useCase: 开场定场交代环境/大场景调度
+    "整个人全身（从头到脚）":
+      term: Full Shot (FS)
+      focal: 35mm
+      aperture: f/5.6
+      useCase: 完整展示角色服装/动作/全身比例
+    "膝盖以上到头顶":
+      term: Medium Long Shot (MLS) / Cowboy Shot
+      focal: 40mm
+      aperture: f/4.0
+      useCase: 动作戏份+上半身表演
+    "腰部以上到头顶":
+      term: Medium Shot (MS)
+      focal: 50mm standard prime
+      aperture: f/2.8 - f/4.0
+      useCase: 日常对话+双人同框（标准景别，80%视频场景首选）
+    "胸部以上到头顶":
+      term: Medium Close-up (MCU)
+      focal: 50mm - 85mm
+      aperture: f/2.0 - f/2.8
+      useCase: 单人台词/微表情戏份（9:16短视频最常用）
+    "肩膀以上只拍脸部":
+      term: Close-up (CU)
+      focal: 85mm portrait
+      aperture: f/1.4 - f/2.0 shallow depth of field
+      useCase: 爆点表情特写/眼泪/笑容高光时刻
+    "只拍眼睛/嘴唇/局部细节":
+      term: Extreme Close-up (ECU)
+      focal: 100mm macro
+      aperture: f/2.8
+      useCase: 极致情绪爆发/道具细节特写
+
+composition:
+  userQuestion: "人物是站在画面左边？右边？还是居中？"
+  mapping:
+    "左边（观众视角看左边）":
+      term: Rule of Thirds, subject on left 1/3 line
+      eyeline: Leading room 2/3 on right side (nose room)
+      note: 视线引导到画面右侧，适合人物看向右边或剧情往右侧推进
+    "右边（观众视角看右边）":
+      term: Rule of Thirds, subject on right 1/3 line
+      eyeline: Leading room 2/3 on left side
+      note: 视线引导到画面左侧
+    "正中间对称居中":
+      term: Center Framing / Symmetry Composition
+      eyeline: Equal negative space on both sides
+      note: 仪式感/权威感/神明降临/正式宣告场景
+    "偏角落，故意留白多":
+      term: Negative Space / Minimalist Composition
+      eyeline: Large empty area emphasizes isolation
+      note: 孤独感/失落感/宏大场景小人物情绪
+    "前景遮挡制造层次":
+      term: Foreground Framing / Layered Composition
+      eyeline: Out-of-focus object 20% area near lens
+      note: 增加真实电影感景深，适合门窗/栏杆/花从遮挡
+
+lightingSetup:
+  userQuestion: "场景光线整体是明亮还是偏暗？是冷色还是暖色？"
+  mapping:
+    "白天自然光（明亮+暖）":
+      term: Practical Sun + 3-Point Lighting, Key Light 45° top-right, Fill Soft Left Fill (3:1 ratio)
+      colorTemperature: 5500K Daylight
+      cct: 5500
+      intensityRatio: "3:1 (Strong key, soft fill)"
+    "黄昏夕阳（暖色调电影感）":
+      term: Golden Hour Backlight, Warm Rim Light on hair edges, Front Bounced Fill (2:1)
+      colorTemperature: 3200K - 4500K Golden Hour
+      cct: 3800
+      intensityRatio: 2:1
+      note: 浪漫场景首选，发丝边缘金色轮廓光
+    "室内暖黄灯光（温馨）":
+      term: Warm Practical Lamp + Soft Box Key 45°, Bounced ambient no hard shadows (1.5:1)
+      colorTemperature: 2700K Cozy Warm White
+      cct: 2700
+      intensityRatio: "1.5:1 very soft contrast"
+      note: 卧室/咖啡馆/浪漫私密场景
+    "夜晚冷蓝灯光（阴暗冷酷）":
+      term: Cool Moonlight Practical Key 45°, Deep Blue Gel Fill 2:1 Contrast
+      colorTemperature: 6500K - 8000K Cool Blue Night
+      cct: 7200
+      intensityRatio: 2:1
+      note: 暗影折磨/悬疑/恐惧场景
+    "高对比逆光剪影（神秘）":
+      term: Strong Backlight Rim, Underexposed Front 4:1 Ratio, Near-Silhouette
+      colorTemperature: "6000K rim, 3000K ambient"
+      cct: 6000
+      intensityRatio: 4:1
+      note: 神秘角色第一次出场/爆点降临
+
+cameraLens:
+  userQuestion: "你想要画面电影感强一点？还是真实生活感？"
+  mapping:
+    "电影感强（背景虚化浅景深，突出人物）":
+      lens: 50mm f/1.4 Standard Prime
+      projection: Spherical Anamorphic Desqueeze 2.39:1 (Cinematic Letterbox optional on 9:16)
+      depthOfField: Very Shallow, eyes sharp, shoulders/background soft out-of-focus bokeh
+      distortion: Rectilinear minimal
+    "真实生活纪录片感（全画面清晰）":
+      lens: 35mm f/5.6 General Purpose
+      projection: Spherical native 9:16 / 16:9
+      depthOfField: Moderate deep, entire subject sharp + background still legible
+      distortion: Barrel &lt; 0.5%
+    "宏大环境广角视野":
+      lens: 24mm f/8 Wide Angle
+      projection: Spherical native
+      depthOfField: Deep focus from foreground 0.5m → infinity
+      distortion: Perspective natural convergence (no fisheye)
+    "远处人物特写压缩空间":
+      lens: 85mm f/1.8 Portrait Tele
+      projection: Spherical
+      depthOfField: Extreme shallow background completely blown bokeh circles
+      note: 爱情戏/爆点情绪特写首选
+
+motionFrame:
+  userQuestion: "帧率要流畅？还是标准电影感？"
+  mapping:
+    "标准电影感（首选，几乎所有场景通用）":
+      frameRate: 24fps (Cinematic Standard, Academy Award 24fps)
+      shutterAngle: 180°
+      shutterSpeed: 1/48s (180° rule)
+      motionBlur: Natural cinematic motion blur
+      note: 90% AI 视频项目默认值，最有电影感
+    "短视频平台流畅（30fps广电标准）":
+      frameRate: 30fps Broadcast
+      shutterAngle: 180°
+      shutterSpeed: 1/60s
+      motionBlur: Reduced
+      note: 抖音/快手平台通用
+    "慢动作丝滑":
+      frameRate: 60fps Slow Motion Master
+      shutterSpeed: 1/125s
+      conformedTo: 24fps in post for 2.5x smooth slow-mo
+      note: 爆点动作片段（掀裙/圣光/召唤）专用
+
+colorGrading:
+  userQuestion: "整体色调偏暖/冷/高对比？"
+  mapping:
+    "好莱坞橙青对比（电影感默认首选）":
+      colorSpace: Rec.709 Broadcast
+      gamma: 2.4 (Cinema Standard Dark Environment)
+      palette: Teal &amp; Orange Hollywood Contrast LUT, shadows teal, midtones natural, highlights orange-warm
+    "温暖日系柔和":
+      colorSpace: Rec.709
+      gamma: 2.2
+      palette: Lift Shadows Warm Yellow, Soft Mids, Desaturated Highlights
+    "冷蓝青灰色悬疑":
+      colorSpace: Rec.709
+      gamma: 2.4
+      palette: Desaturated Cyan Cool Blue Lift, Low Contrast Flat Mids, Crushed Blacks
+    "古风暖棕朱砂":
+      colorSpace: Rec.709
+      gamma: 2.3
+      palette: Sepia Earth Tone Brown Base + Vermilion Accent Reds, Traditional Chinese Aesthetic
+    "赛博朋克霓虹":
+      colorSpace: Rec.709 Wide Gamut
+      gamma: 2.4
+      palette: Magenta Shadows + Cyan Highlights + Neon Purple Rim + Deep Blacks
+
+furnitureReferenceAnchors:
+  note: 写实风格专用（家具参照物锚点法），其他风格忽略。
+  standardCm:
+    bedHeight: 74
+    deskHeight: 96
+    doorHandleHeight: 125
+    diningChairSeatHeight: 45
+    kitchenCounterHeight: 92
+    hellhound80Height: 80
+    gnomeAdultMinHeight: 90
+    gnomeAdultMaxHeight: 120
+    humanAdultFemaleAvg: 165
+    humanAdultMaleAvg: 180
+  usage: "在双人/三人同框提示词中写入真实高度数字，解决 AI 压缩身高差比例翻车问题"
+  example:
+    - "马库斯（男性人类 180cm）+ 塔薇（侏儒 90cm 身高差 2:1，侏儒头顶到马库斯腰带高度 90cm，床沿 74cm 参照物对比）"
+    - "门把手 125cm + 书桌 96cm 双锚点人物比例透视检查"
+
+percentagePrivilegeAnchors:
+  note: 双人/三人同框专用（百分比特权锚点法），写实风格强制开启
+  singleCharacter:
+    fullShot: 头顶 5-8% / 脚底 10%
+    mediumShot: 头顶 8-12% / 身体底 35%
+    closeUp: 头顶 10-15% / 下颌 70%
+  dualCharacter:
+    tallerMale: 头顶 5-8% / 脚底 10%
+    shorterFemale: 头顶 8-12% / 脚底 10%
+  trioAddThird:
+    mediumHeight: 头顶 7-10%
+  noteUsage: "直接写入提示词开头，把 AI 构图的自由空间收窄，解决比例失调"
