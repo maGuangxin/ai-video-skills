@@ -29,17 +29,20 @@ git submodule update --init --recursive
 
 把解压后的目录命名为 `ai-video-skills/`，放在项目根目录。
 
-## 2. 按 IDE / Agent 选择安装模式
+## 2. 按安装层级选择模式
 
-如果你的目标是“让当前项目在 IDE 里直接感知 Skill”，不要先假设所有 IDE 都走 `.trae/`。正确顺序是：
+如果你的目标是“让当前 IDE 直接感知 Skill”，正确顺序不是先问 `.trae`，而是先确定安装层级：
 
-1. 先识别当前 IDE / Agent 类型
-2. 再判断它支持哪种安装模式
-3. 最后检查对应目录或降级方案
+1. 默认当前 IDE
+2. 用户明确要求时，可多 IDE 安装
+3. 用户明确要求时，可全局安装
+4. 只有前面都不成立时，才走手动兜底
 
-当前仓库目前支持 3 种模式：
+### 2.1 默认当前 IDE
 
-### 2.1 Trae：项目级 `.trae/`
+先识别当前 IDE / Agent 类型，再决定它的默认安装目标。
+
+#### Trae
 
 如果当前 IDE 是 Trae，可使用本仓库已提供的脚本闭环。
 
@@ -69,7 +72,7 @@ ai-video-skills\apply-trae.bat apply
 ai-video-skills\apply-trae.bat check
 ```
 
-Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
+Trae 作为“当前 IDE 默认安装目标”时，满足下面 5 条才算安装态成立：
 
 1. `<project-root>/.trae/` 存在
 2. `<project-root>/.trae/whoIam.md` 存在
@@ -77,9 +80,9 @@ Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
 4. `<project-root>/.trae/rules/` 存在
 5. `<project-root>/.trae/skills.manifest.yaml` 存在
 
-### 2.2 其他 IDE / Agent：项目级目录按官方文档
+#### 其他 IDE / Agent
 
-如果当前 IDE / Agent 也支持项目级 Skill 目录，但目录名、配置文件名或刷新方式与 Trae 不同：
+如果当前 IDE / Agent 也支持项目级或工作目录安装，但目录名、配置文件名或刷新方式与 Trae 不同：
 
 1. 不要硬套 `.trae`
 2. 先按该 IDE / Agent 官方文档确认项目级目录
@@ -88,9 +91,27 @@ Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
 
 当前仓库**不对其他 IDE 的项目级目录做硬编码**，以避免编造不存在的目录规则。
 
-### 2.3 不支持项目级安装：仓库旁路 + 手动读取
+### 2.2 多 IDE 安装
 
-如果当前 IDE / Agent 不支持项目级安装：
+如果用户明确要求多个 IDE / Agent 同时可用：
+
+1. 列出所有目标 IDE / Agent
+2. 分别记录每个目标的目录规则
+3. 分别执行检查
+4. 最终汇总每个目标的检查结果，而不是只写一个总状态
+
+### 2.3 全局安装
+
+如果用户明确要求多个项目复用，或当前 IDE 更适合全局目录：
+
+1. 先确认全局目录来源
+2. 若目录来自官方文档，按官方文档记录
+3. 若目录由用户明确指定，也要记录清楚
+4. 检查全局目录安装态是否通过
+
+### 2.4 手动兜底：仓库旁路 + 手动读取
+
+如果默认当前 IDE、多 IDE、全局安装都不成立，才进入最后的手动兜底：
 
 1. 保留完整的 `ai-video-skills/` 仓库目录
 2. 不宣称 IDE 已项目级感知该 Skill
@@ -148,7 +169,7 @@ Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
 满足下面 4 条即可认为安装基本成功：
 
 1. 工作区中存在完整的 `ai-video-skills/`
-2. 若目标是项目内安装，则当前 IDE / Agent 对应安装态检查已通过，或已明确降级为 `manual-fallback`
+2. 若目标包含 Skill 安装，则默认当前 IDE / 多 IDE / 全局中的对应检查已通过，或已明确记录 `manual-fallback`
 3. Agent 至少能稳定读取 `skills/*/SKILL.md`
 4. 能跑通 `examples/quickstart-cafe-scene/walkthrough.md` 的单段 smoke test
 
@@ -177,16 +198,17 @@ Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
 ### 步骤
 
 1. 确认 `ai-video-skills/` 目录完整
-2. 如果目标是 Trae 项目内安装，先执行 `init -> apply -> check`
-3. 如果目标是其他 IDE 项目内安装，先按官方文档确认目录与检查方式
-4. 打开 `examples/quickstart-cafe-scene/walkthrough.md`
-5. 让 Agent 按其中的单段示例依次执行 `sk0` 到 `sk6`
-6. 最后检查 `sk5` 是否能输出明确状态
+2. 如果当前 IDE 是 Trae，且默认当前 IDE 安装，先执行 `init -> apply -> check`
+3. 如果是其他 IDE 默认安装，先按官方文档确认目录与检查方式
+4. 如果是多 IDE 或全局安装，先列出目标并分别检查
+5. 打开 `examples/quickstart-cafe-scene/walkthrough.md`
+6. 让 Agent 按其中的单段示例依次执行 `sk0` 到 `sk6`
+7. 最后检查 `sk5` 是否能输出明确状态
 
 ### 看到这些结果就算通过
 
 - `00_project-config/project-base-config.md` 已生成
-- 如果目标是项目内安装，当前 IDE / Agent 对应安装态检查通过，或已明确记录 `manual-fallback`
+- 如果目标包含 Skill 安装，当前 IDE / Agent 对应安装态检查通过，或已明确记录 `manual-fallback`
 - `03_storyboard/` 下出现分镜与 shot 目录
 - `video-prompt.md`、SRT、TTS 清单、进度总览能按规则生成
 - 缺项时 Agent 会暂停确认，而不是直接脑补
@@ -203,9 +225,10 @@ Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
 如果没有成功加载，按这个顺序排查：
 
 1. 仓库目录是否完整
-2. 若目标是 Trae 项目内安装，`.trae` 是否已执行 `init / apply / check`
-3. 若目标是其他 IDE 项目内安装，是否已按官方文档确认对应目录和刷新方式
-4. Agent 是否至少能读取 `SKILL.md`
-5. 是否误以为 manifest 一定会被自动加载
-6. 是否直接跳过了 `sk0` 或 `sk0b`
-7. smoke test 是否先在单段示例上跑通
+2. 若目标是当前 IDE 默认安装，是否已确认当前 IDE 的默认目录与检查方式
+3. 若目标是多 IDE 安装，是否已分别列出并检查每个目标
+4. 若目标是全局安装，是否已确认全局目录来源与检查结果
+5. Agent 是否至少能读取 `SKILL.md`
+6. 是否误以为 manifest 一定会被自动加载
+7. 是否直接跳过了 `sk0` 或 `sk0b`
+8. smoke test 是否先在单段示例上跑通

@@ -9,10 +9,11 @@
 如果你是第一次使用，建议只按下面 5 步开始：
 
 1. 阅读 `docs/install-guide-for-agents.md`
-2. 如果希望 IDE 在项目内直接感知 Skill，先识别当前 IDE / Agent 的安装模式：
-   - 如果当前 IDE 是 Trae，再执行项目根目录 `.trae` 安装
-   - 如果是其他支持项目级 Skill 目录的 IDE / Agent，按其官方文档定位目录
-   - 如果不支持项目级安装，则保留仓库旁路并手动读取 `SKILL.md`
+2. 如果希望 IDE 直接感知 Skill，先识别安装层级：
+   - 默认先安装到当前 IDE
+   - 用户明确要求时，可扩展到多 IDE
+   - 用户明确要求时，可安装到全局目录
+   - 只有前面都不成立时，才走手动读取 `SKILL.md`
 3. 选择接入方式：
    - 能直接让 Agent 读取 Markdown 时，优先使用 `skills/*/SKILL.md` 手动调用方式
    - 只有在当前 Agent 明确支持 manifest 时，再尝试 `skills.manifest.yaml`
@@ -52,8 +53,8 @@
 推荐先跑单段 smoke test：
 
 1. 准备 `ai-video-skills/`
-2. 如果当前 IDE 是 Trae 且目标是项目内安装，先跑 `apply-trae.sh` 或 `apply-trae.bat`
-3. 如果是其他 IDE / Agent，先确认其项目级目录或降级为手动读取
+2. 如果当前 IDE 是 Trae 且默认当前 IDE 安装，先跑 `apply-trae.sh` 或 `apply-trae.bat`
+3. 如果是其他 IDE / Agent，先确认其默认安装目录；如用户要求，再扩展到多 IDE 或全局
 4. 让 Agent 按顺序读取：
    - `skills/sk0_project_init_guided/SKILL.md`
    - `skills/sk0b_missing_field_guide/SKILL.md`
@@ -69,7 +70,7 @@
 
 首次 smoke test 满足下面 5 条，就可以认为接入基本可用：
 
-1. 若目标是项目内安装，当前 IDE / Agent 对应安装态检查通过，或已明确记录 `manual-fallback`
+1. 若目标包含 Skill 安装，当前安装层级下的检查通过，或已明确记录 `manual-fallback`
 2. Agent 能稳定读取 `skills/*/SKILL.md`
 3. 能生成对应步骤要求的文档骨架和输出文件
 4. `sk5_consistency_audit` 能产出明确的状态结果，而不是中途失控补写

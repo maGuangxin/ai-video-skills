@@ -183,8 +183,8 @@
       "additionalProperties": false,
       "required": [
         "currentIdeType",
-        "installMode",
-        "requireProjectLevelCheck"
+        "installScope",
+        "installCheckStatus"
       ],
       "properties": {
         "currentIdeType": {
@@ -195,38 +195,88 @@
             "unsupported-project-install",
             "unknown"
           ],
-          "description": "当前 IDE / Agent 类型。必须先识别环境，再决定安装目录或旁路方案。"
+          "description": "当前 IDE / Agent 类型。必须先识别环境，再决定安装范围和目标。"
         },
-        "installMode": {
+        "installScope": {
           "type": "string",
           "enum": [
-            "trae-project-level",
-            "ide-project-level",
-            "repository-adjacent-manual",
+            "current-ide",
+            "multi-ide",
+            "global",
+            "manual-fallback",
             "unknown"
           ],
-          "description": "安装模式。Trae 使用 .trae；其他支持项目级安装的 IDE 按官方文档；不支持项目级安装时改走仓库旁路手动读取。"
+          "description": "安装范围。默认优先当前 IDE；用户可显式要求多 IDE 或全局；只有前述方式不成立时才允许 manual-fallback。"
         },
-        "requireProjectLevelCheck": {
-          "type": "boolean",
-          "description": "若为 true，则 sk0 必须检查当前 IDE / Agent 对应的项目级安装态；若当前 IDE 不支持项目级安装，则必须明确记录 manual-fallback。"
+        "installTargets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "安装目标列表。多 IDE 安装时必须列出所有目标 IDE / Agent。"
         },
-        "projectLevelCheckTarget": {
+        "currentIdeInstallTarget": {
           "type": "string",
-          "description": "当前 IDE / Agent 的项目级安装检查目标路径或说明。对非 Trae IDE 不得编造目录，应引用官方文档。"
+          "description": "当前 IDE 默认安装目标路径或说明。对非 Trae IDE 不得编造目录，应引用官方文档。"
+        },
+        "globalInstallTarget": {
+          "type": "string",
+          "description": "全局安装目标路径。若用户未要求全局安装，可留空或标记为无。"
+        },
+        "installCheckStatus": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "missing",
+            "partial",
+            "manual-fallback",
+            "unknown"
+          ],
+          "description": "Skill 安装态检查结果。"
+        },
+        "targetCheckBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "target",
+              "checkStatus"
+            ],
+            "properties": {
+              "target": {
+                "type": "string"
+              },
+              "pathOrRule": {
+                "type": "string"
+              },
+              "checkStatus": {
+                "type": "string",
+                "enum": [
+                  "passed",
+                  "missing",
+                  "partial",
+                  "manual-fallback",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "description": "每个安装目标的检查明细。"
         },
         "automationSupport": {
           "type": "string",
           "enum": [
             "trae-script",
             "manual-only",
+            "partial",
             "unknown"
           ],
           "description": "自动化安装支持情况。当前仓库仅为 Trae 提供脚本闭环。"
         },
         "mustInstallToProjectRoot": {
           "type": "boolean",
-          "description": "兼容旧字段。建议改用 requireProjectLevelCheck；仅表达是否要求项目级安装，不再隐含 .trae。"
+          "description": "兼容旧字段。仅表达是否要求项目级安装，不再隐含 .trae。"
         },
         "requireTraeCheck": {
           "type": "boolean",

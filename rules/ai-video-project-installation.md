@@ -5,14 +5,17 @@
 当用户明确要求“当前项目在 IDE 内直接使用 Skill”时，必须检查：
 
 1. 当前 IDE / Agent 类型是否已识别
-2. 当前安装模式是否已识别：`trae-project-level / ide-project-level / repository-adjacent-manual`
-3. 若为 `trae-project-level`，检查：
+2. 当前安装范围是否已识别：`current-ide / multi-ide / global / manual-fallback`
+3. 若为 `current-ide`，检查当前 IDE 的默认安装目标
+4. 若当前 IDE 为 Trae，检查：
    - `<project-root>/.trae/`
    - `<project-root>/.trae/whoIam.md`
    - `<project-root>/.trae/skills/`
    - `<project-root>/.trae/rules/`
-4. 若为 `ide-project-level`，按该 IDE / Agent 官方文档检查其项目级 Skill 目录、配置文件和刷新方式
-5. 若为 `repository-adjacent-manual`，明确记录当前 IDE 不支持项目级安装，且只能通过仓库旁路手动读取 `SKILL.md`
+5. 若当前 IDE 非 Trae，按该 IDE / Agent 官方文档检查其默认安装目录、配置文件和刷新方式
+6. 若为 `multi-ide`，分别记录每个目标的安装目录和检查结果
+7. 若为 `global`，记录全局目录来源与检查结果
+8. 只有在前述方式不成立时，才允许 `manual-fallback`
 
 未完成上述检查前，不得宣称 Skill 已在项目内生效。
 
