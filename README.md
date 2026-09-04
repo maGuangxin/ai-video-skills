@@ -6,14 +6,17 @@
 
 ## 先看这里
 
-如果你是第一次使用，建议只按下面 4 步开始：
+如果你是第一次使用，建议只按下面 5 步开始：
 
 1. 阅读 `docs/install-guide-for-agents.md`
-2. 选择接入方式：
+2. 如果希望 IDE 在项目内直接感知 Skill，先执行项目根目录 `.trae` 安装：
+   - macOS / Linux：`./ai-video-skills/apply-trae.sh all`
+   - Windows：`ai-video-skills\apply-trae.bat all`
+3. 选择接入方式：
    - 能直接让 Agent 读取 Markdown 时，优先使用 `skills/*/SKILL.md` 手动调用方式
    - 只有在当前 Agent 明确支持 manifest 时，再尝试 `skills.manifest.yaml`
-3. 运行 `examples/quickstart-cafe-scene/walkthrough.md`
-4. 看到 smoke test 成功标准后，再进入真实项目
+4. 运行 `examples/quickstart-cafe-scene/walkthrough.md`
+5. 看到 smoke test 成功标准后，再进入真实项目
 
 ## 这套 Skill 重点解决什么
 
@@ -48,7 +51,8 @@
 推荐先跑单段 smoke test：
 
 1. 准备 `ai-video-skills/`
-2. 让 Agent 按顺序读取：
+2. 如果目标是项目内安装，先跑 `apply-trae.sh` 或 `apply-trae.bat`
+3. 让 Agent 按顺序读取：
    - `skills/sk0_project_init_guided/SKILL.md`
    - `skills/sk0b_missing_field_guide/SKILL.md`
    - `skills/sk1_character_design/SKILL.md`
@@ -57,16 +61,17 @@
    - `skills/sk4_prompt_generator/SKILL.md`
    - `skills/sk5_consistency_audit/SKILL.md`
    - `skills/sk6_postproduction_bundle/SKILL.md`
-3. 按 `examples/quickstart-cafe-scene/walkthrough.md` 提供的单段示例执行
+4. 按 `examples/quickstart-cafe-scene/walkthrough.md` 提供的单段示例执行
 
 ### 什么算成功
 
-首次 smoke test 满足下面 4 条，就可以认为接入基本可用：
+首次 smoke test 满足下面 5 条，就可以认为接入基本可用：
 
-1. Agent 能稳定读取 `skills/*/SKILL.md`
-2. 能生成对应步骤要求的文档骨架和输出文件
-3. `sk5_consistency_audit` 能产出明确的状态结果，而不是中途失控补写
-4. Skill 能给出当前模型下更稳的生产路线，而不是默认所有能力都可用
+1. 若目标是项目内安装，`.trae` 检查通过
+2. Agent 能稳定读取 `skills/*/SKILL.md`
+3. 能生成对应步骤要求的文档骨架和输出文件
+4. `sk5_consistency_audit` 能产出明确的状态结果，而不是中途失控补写
+5. Skill 能给出当前模型下更稳的生产路线，而不是默认所有能力都可用
 
 ### 出问题先看哪里
 
@@ -76,6 +81,7 @@
 2. `docs/dependency-flow.md`
 3. `docs/faq.md`
 4. 对应 Skill 目录下的 `SKILL.md`、`prompts.md`、`outputs-template.md`
+5. `apply-trae.sh` / `apply-trae.bat`
 
 ## 接入方式
 
@@ -142,6 +148,7 @@
 - 不要求绑定某一个 Agent
 - 不承诺所有 Agent 都能自动识别 manifest
 - 不默认所有模型都支持长视频、原生台词或稳定口型
+- 不把 `showcase_pack` 冒充为 `reference_pack`
 - 遇到事实缺失时，正确行为是暂停并追问，不是补写默认值
 
 ## 文档入口

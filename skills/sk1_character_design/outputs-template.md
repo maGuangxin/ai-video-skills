@@ -56,7 +56,7 @@
 - 常见身体重心与站姿
 
 ## 5. 视频参考资产计划
-### 5.1 video_reference_pack
+### 5.1 reference_asset_plan
 - `showcase_pack`
   - 角色展示图
   - 角色风格审阅图

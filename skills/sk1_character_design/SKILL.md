@@ -58,7 +58,7 @@
 1. `hard_invariants`：绝不应漂移的角色事实
 2. `soft_variants`：允许轻微变化的视觉细节
 3. `story_driven_variants`：只允许按剧情变化的状态
-4. `video_reference_pack`：用于多角度参考与镜头绑定
+4. `reference_asset_plan`：用于记录多角度参考与镜头绑定计划
 5. `continuity_state_fields`：用于跨镜头追踪角色状态
 
 此外必须把角色相关图片资产分成两类：

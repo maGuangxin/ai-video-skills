@@ -3,9 +3,10 @@
 本文档只回答 4 个问题：
 
 1. 如何把 `ai-video-skills/` 放到项目里
-2. 哪种接入方式更稳
-3. 第一次应该怎么验证
-4. 失败时先排查什么
+2. 如何把 Skill 安装到项目根目录 `.trae`
+3. 哪种接入方式更稳
+4. 第一次应该怎么验证
+5. 失败时先排查什么
 
 ## 1. 获取仓库
 
@@ -28,7 +29,51 @@ git submodule update --init --recursive
 
 把解压后的目录命名为 `ai-video-skills/`，放在项目根目录。
 
-## 2. 接入方式分层
+## 2. 项目根目录安装闭环
+
+如果你的目标是“让当前项目在 IDE 里直接感知 Skill”，不要停在“仓库放进来了”，还要把 Skill 同步到项目根目录 `.trae/`。
+
+推荐顺序：
+
+### 2.1 macOS / Linux
+
+假设目录结构是：
+
+```text
+<project-root>/
+├── ai-video-skills/
+└── <你的项目文件>
+```
+
+在 `<project-root>/` 下执行：
+
+```bash
+./ai-video-skills/apply-trae.sh init
+./ai-video-skills/apply-trae.sh apply
+./ai-video-skills/apply-trae.sh check
+```
+
+### 2.2 Windows
+
+在项目根目录执行：
+
+```bat
+ai-video-skills\apply-trae.bat init
+ai-video-skills\apply-trae.bat apply
+ai-video-skills\apply-trae.bat check
+```
+
+### 2.3 check 通过的最小标准
+
+满足下面 5 条才算“项目根目录安装态成立”：
+
+1. `<project-root>/.trae/` 存在
+2. `<project-root>/.trae/whoIam.md` 存在
+3. `<project-root>/.trae/skills/` 存在
+4. `<project-root>/.trae/rules/` 存在
+5. `<project-root>/.trae/skills.manifest.yaml` 存在
+
+## 3. 接入方式分层
 
 为避免把兼容性说得过满，接入方式按确定性分为 3 层：
 
@@ -74,15 +119,16 @@ git submodule update --init --recursive
 - 技能目录位置、配置名称、刷新时机，以对应 Agent 官方文档为准
 - 如果这一步不稳定，建议回退到 2.1 或 2.2
 
-## 3. 最小成功标准
+## 4. 最小成功标准
 
-满足下面 3 条即可认为安装基本成功：
+满足下面 4 条即可认为安装基本成功：
 
 1. 工作区中存在完整的 `ai-video-skills/`
-2. Agent 至少能稳定读取 `skills/*/SKILL.md`
-3. 能跑通 `examples/quickstart-cafe-scene/walkthrough.md` 的单段 smoke test
+2. 若目标是项目内安装，则 `.trae` check 已通过
+3. Agent 至少能稳定读取 `skills/*/SKILL.md`
+4. 能跑通 `examples/quickstart-cafe-scene/walkthrough.md` 的单段 smoke test
 
-## 4. 手动调用模板
+## 5. 手动调用模板
 
 当 Agent 不支持 manifest 或你不想依赖自动扫描时，可以直接使用下面这段调用说明：
 
@@ -100,37 +146,40 @@ git submodule update --init --recursive
 遇到缺项时，不要补写默认值，按对应 SKILL.md 的缺项规则暂停并追问。
 ```
 
-## 5. Smoke Test
+## 6. Smoke Test
 
 第一次建议只验证单段链路，不要直接上完整项目。
 
 ### 步骤
 
 1. 确认 `ai-video-skills/` 目录完整
-2. 打开 `examples/quickstart-cafe-scene/walkthrough.md`
-3. 让 Agent 按其中的单段示例依次执行 `sk0` 到 `sk6`
-4. 最后检查 `sk5` 是否能输出明确状态
+2. 如果目标是项目内安装，先执行 `init -> apply -> check`
+3. 打开 `examples/quickstart-cafe-scene/walkthrough.md`
+4. 让 Agent 按其中的单段示例依次执行 `sk0` 到 `sk6`
+5. 最后检查 `sk5` 是否能输出明确状态
 
 ### 看到这些结果就算通过
 
 - `00_project-config/project-base-config.md` 已生成
+- 如果目标是项目内安装，`.trae` 检查通过
 - `03_storyboard/` 下出现分镜与 shot 目录
 - `video-prompt.md`、SRT、TTS 清单、进度总览能按规则生成
 - 缺项时 Agent 会暂停确认，而不是直接脑补
 
-## 6. Windows 补充说明
+## 7. Windows 补充说明
 
 - 不确定软链接是否可用时，直接复制目录
 - 不确定终端命令格式时，优先手动放置目录，不依赖命令行安装
 - 文件命名避免 `<>:"/\\|?*`
 - 优先使用相对路径，减少绝对路径差异带来的问题
 
-## 7. 排查顺序
+## 8. 排查顺序
 
 如果没有成功加载，按这个顺序排查：
 
 1. 仓库目录是否完整
-2. Agent 是否至少能读取 `SKILL.md`
-3. 是否误以为 manifest 一定会被自动加载
-4. 是否直接跳过了 `sk0` 或 `sk0b`
-5. smoke test 是否先在单段示例上跑通
+2. 若目标是项目内安装，`.trae` 是否已执行 `init / apply / check`
+3. Agent 是否至少能读取 `SKILL.md`
+4. 是否误以为 manifest 一定会被自动加载
+5. 是否直接跳过了 `sk0` 或 `sk0b`
+6. smoke test 是否先在单段示例上跑通

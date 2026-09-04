@@ -9,8 +9,9 @@ crossPlatformCompatibility:
   forbiddenCharacters: '< > : " / \ | ? *'
   notes:
     - 所有目录名和文件名都应避免 Windows 非法字符：<>:"/\\|?*
-    - 推荐仅使用英文字母、数字、连字符 `-` 和下划线 `_`
-    - 语义化命名允许中文出现在文档正文，不建议放进需要跨平台共享的文件名
+    - Skill 内部 ID、schema 字段、类型名、API 名统一保持英文
+    - 项目业务目录名与业务文件名应跟随项目语言环境，而不是强制一刀切全英文
+    - 如项目语言策略为中文，允许业务文档名和业务图片名使用中文语义命名，但仍需避免非法字符
 
 namingFormula:
   directories: "[类别前缀]-[ID]-[语义化核心内容]"
@@ -96,3 +97,19 @@ temporaryWorkspaceRules:
     # 临时文件删除建议清单（阶段：<STAGE_ID>）
     # 本清单由 Skill 自动生成，仅供您参考。请手动确认后删除，Skill **不会自动删除任何文件**以防误删。
     文件名 | 不再使用的原因 | 建议删除时间
+
+languagePolicyNotes:
+  businessPathLanguage:
+    - zh-CN
+    - en-US
+    - mixed
+  artifactFileLanguage:
+    - zh-CN
+    - en-US
+    - mixed
+  internalIdentifierLanguage:
+    - en-US
+  notes:
+    - `businessPathLanguage` 控制业务目录路径语言
+    - `artifactFileLanguage` 控制业务图片名、说明文档名、验证产物名
+    - `internalIdentifierLanguage` 固定为英文，不跟随项目语言变化
