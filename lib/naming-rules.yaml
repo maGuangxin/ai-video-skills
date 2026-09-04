@@ -2,6 +2,16 @@ rulesVersion: 1.0
 enforcement: strict
 allowFallback: false
 
+crossPlatformCompatibility:
+  targetPlatforms:
+    - macOS
+    - Windows
+  forbiddenCharacters: '< > : " / \ | ? *'
+  notes:
+    - 所有目录名和文件名都应避免 Windows 非法字符：<>:"/\\|?*
+    - 推荐仅使用英文字母、数字、连字符 `-` 和下划线 `_`
+    - 语义化命名允许中文出现在文档正文，不建议放进需要跨平台共享的文件名
+
 namingFormula:
   directories: "[类别前缀]-[ID]-[语义化核心内容]"
   files:       "[类别前缀]-[ID]-[语义化核心内容]-[可选版本号].[ext]"

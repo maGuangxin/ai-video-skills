@@ -1,37 +1,109 @@
-# SKILL: sk4_prompt_generator（提示词批量生成 · 全 Skill 包核心价值 Skill）
+# SKILL: sk4_prompt_generator
 
-## 一、职责边界
-**做什么**：根据 SK3 拆分好的每段视频，结合项目风格激活对应的核心技术开关，按 `schemas/prompt.schema.json` 为每段生成 1 份 `video-prompt.md`（中英双语 + 6 大类负向 + 翻车兜底 3 条）。
+## 1. 作用
 
-**激活的 3 大核心技术开关（完全来自 style-presets.yaml，不手写死写实）**：
-1. **写实 3 次夹攻法**（写实风格=true，其他 false/partial）：提示词「开头权重最高处双写实前缀 / 角色段末尾二次材质写实 / 灯光魔法段末尾三次禁平光」，解决 Seedance 豆包端只有开头权重高的问题
-2. **完整前缀强制复制法**（所有风格=true）：角色段必须从 `character-consistency-rules.md` 的 **3.1 / 3.2 / 3.3 直接复制粘贴原 3 行**，不允许 AI 自己简写或漏装备细节
-3. **百分比特权 + 家具参照物锚点法**（写实/科幻/赛博=true）：在提示词开头写「角色 A 头顶 5-8% / 鞋底 10% / 角色 B 头顶 8-10%」+「床沿 74cm / 书桌 96cm / 门把手 125cm」真实 cm 数字
+本 Skill 用于基于分镜、角色和场景真相源生成每段 `video-prompt.md`。
 
-**额外配套激活**：口型 6 正词 7 禁词（有台词模式全段精确到秒段） + 6 大类 48 项负向词桶（写实风格 6 桶全开，卡通风格关闭 cartoonStyling13 桶）
+标准输出为：
 
-**不做什么**：
-- 不真的调用豆包 API 生成视频
-- 不改分镜时间轴，只严格按 SK3 的时间戳写
+- `03_storyboard/storyboard-<id>-<semantic>/shot-<id>-<semantic>/video-prompt.md`
 
-## 二、输入输出
-### 输入（强制串行依赖 SK3 + SK1）
-- SK3 `storyboard-script.md`（每段动作时间戳 + 台词窗口）
-- SK1 `character-consistency-rules.md: 3.1/3.2/3.3 三行前缀`
-- SK2 `unified-visual-spec.md`
-- `style-presets.yaml` 对应风格模板 + `cinematic-knowledge.yaml` 专业映射
-### 输出
-| 输出 | 路径模板 |
-|---|---|
-| 每段视频提示词（中英双语 + 负向 + 兜底）| `03_storyboard/storyboard-<ID>/shot-<ID>-<SEMANTIC>/video-prompt.md` |
+## 2. 不做的事
 
-## 三、执行步骤（每段视频循环）
-1. 读 style-presets 的 artStyle，激活对应的 3 大技术开关
-2. 写第 1 次写实夹攻前缀（对应开关开才写）
-3. **角色段强制直接复制 3.1/3.2/3.3 三行原内容，不改写不漏项** → 末尾追加第 2 次材质写实夹攻
-4. 写场景段 + cameraCinematicBlock（景别/构图/灯光/镜头/色彩全从 cinematic-knowledge 映射来专业词，用户不用懂）
-5. 写动作时间戳 + 口型 6 正词 7 禁词精确到秒段
-6. 写灯光魔法段 + 末尾第 3 次禁平光夹攻
-7. 写 6 大类负向词桶（对应开关开的桶才写，卡通关 cartoonStyling 桶）
-8. 写翻车兜底 3 条（豆包端局部修改：圈嘴/圈发色/圈卡通）
-9. 合并为中文版 + 英文版，写入 video-prompt.md
+- 不调用视频生成服务
+- 不重写前置步骤已经确认的角色前缀
+- 不自行修改分镜时间轴
+
+## 3. 前置条件
+
+- `sk3_storyboard_split` 已完成
+- 角色与场景真相源可读
+- `sk0b_missing_field_guide` 已确认当前步骤关键字段齐全
+
+如果 `sk3` 产物不存在或前置真相源不可读，应暂停。
+
+## 4. 必要输入
+
+- `03_storyboard/**/storyboard-script.md`
+- `01_character-design/docs/character-consistency-rules.md`
+- `00_project-config/unified-visual-spec.md`
+- `00_project-config/project-base-config.md`
+- `lib/style-presets.yaml`
+- `lib/cinematic-knowledge.yaml`
+- `outputs-template.md`
+
+## 5. 缺项处理
+
+当出现以下情况时，应暂停：
+
+- 角色前缀缺失
+- 场景规范缺失
+- 动作时间轴缺失
+- 台词窗口缺失
+- 分镜连续性字段缺失
+- 模型能力画像缺失，无法决定 prompt 模式
+
+建议统一输出：
+
+```text
+⚠️当前步骤已暂停：提示词生成所需的前置产物不完整。
+请先补齐角色规则、场景规范、分镜时间轴和连续性字段，再继续执行 sk4_prompt_generator。
+```
+
+## 6. 核心新增要求
+
+本 Skill 需要根据模型能力和生产模式选择不同 prompt 结构。
+
+至少支持：
+
+1. `safe`：短 prompt、强角色锁定、强锚点、静音优先
+2. `balanced`：加入 continuity block，可尝试短句口型
+3. `expressive`：加入更丰富的镜头语言和中间锚点
+
+每个 prompt 建议至少包含：
+
+1. `global_invariants`
+2. `shot_semantic_block`
+3. `continuity_block`
+4. `motion_and_dialogue_block`
+5. `forbidden_drift_block`
+
+## 7. 执行步骤
+
+1. 读取项目配置中的模型能力画像与推荐生产模式
+2. 读取分镜时间轴与 shot 连续性字段
+3. 从角色真相源中直接引用角色前缀
+4. 从场景真相源中引用场景与镜头依据
+5. 按 `safe / balanced / expressive` 之一生成 `video-prompt.md`
+6. 确保提示词与前置分镜、角色、场景和音频路线保持一致
+
+## 8. 跳步规则
+
+- 当入口为“已有提示词”时，可跳过本 Skill
+- 一旦执行，不应再使用临时猜测内容替代前置真相源
+
+## 9. 成功判定
+
+满足以下条件时，判定为成功：
+
+1. 每个目标 shot 目录下都生成了 `video-prompt.md`
+2. 角色前缀来自真相源，而不是临时改写版本
+3. 动作、台词、时间轴与 `sk3` 保持一致
+4. prompt 模式与模型能力画像一致
+5. 提示词中已包含连续性约束和漂移限制
+
+建议成功输出：
+
+```text
+✅提示词已生成，可以继续执行 sk5_consistency_audit，或并行处理 sk6_postproduction_bundle。
+```
+
+## 10. 失败判定
+
+出现下列情况时，判定为失败或暂停：
+
+1. 关键前置文件缺失
+2. 提示词内容与时间轴不一致
+3. 角色前缀被擅自改写
+4. 输出文件未生成
+5. prompt 模式与模型能力不匹配

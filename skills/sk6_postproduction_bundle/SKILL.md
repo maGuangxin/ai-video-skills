@@ -1,53 +1,106 @@
-# SKILL: sk6_postproduction_bundle（字幕 / TTS配音 / 剪映模板批量生成）
+# SKILL: sk6_postproduction_bundle
 
-## 一、职责边界
-**做什么**：从 SK3 的分镜时间轴自动生成后期三件套：
-1. **SRT 字幕**：每段视频独立 1 份 SRT + 1 份全片统一拼接 SRT
-   - **字幕默认不带角色名前缀**（如「塔薇：」「马库斯：」，用户可通过配置开关开启），这是之前用户确认的标准
-2. **TTS 配音清单**：每段语速/字数/配音角色/情绪/推荐 TTS 引擎参数，用户按清单去任意 TTS 平台配音
-3. **剪映傻瓜教程**：分镜步骤化，用户零基础按步骤点按钮就能拼接 9 段视频 + 字幕 + TTS 配音
+## 1. 作用
 
-**不做什么**：
-- 不调用 TTS 接口真的发音
-- 不打开剪映软件自动操作
-- 不导出最终成片 MP4
+本 Skill 用于基于分镜时间轴生成后期交付包。
 
-## 二、智能串并行（D3 要求）
-- **前置依赖**：只依赖 SK3 分镜脚本的时间轴（台词+秒数）
-- **可以完全并行的步骤（节省总时间）**：
-  - 与「用户画图/生成关键帧/生成视频」**完全并行**
-  - 与 SK4 提示词生成 **并行**
-  - 不需要等视频生成出来，只要分镜时间轴齐了就能生成字幕/TTS
+标准输出包括：
 
-## 三、输入输出
-### 输入
-- SK3：所有 `storyboard-script.md` 里的 B 表（每段台词起止秒、原文、字数）
-- SK0 project-base-config.md：`voiceoverMode`（决定是否开 TTS 参数）/ `namingConvention`
-### 输出
-| 输出 | 路径 |
-|---|---|
-| 每段独立 SRT（N 段 × 1） | `05_final-deliverables/subtitles/sub-shot-<ID>.srt` |
-| 全片统一拼接 SRT（1 份） | `05_final-deliverables/subtitles/full-film-unified.srt` |
-| 全片 TTS 配音清单（1 份）| `05_final-deliverables/tts/tts-voiceover-full.md` |
-| 剪映傻瓜操作手册（1 份）| `05_final-deliverables/tutorials/jianying-step-by-step.md` |
+1. `05_final-deliverables/subtitles/sub-shot-<id>.srt`
+2. `05_final-deliverables/subtitles/full-film-unified.srt`
+3. `05_final-deliverables/tts/tts-voiceover-full.md`
+4. `05_final-deliverables/tutorials/jianying-step-by-step.md`
+5. `05_final-deliverables/audio/voice-strategy.md`
 
-## 四、硬规则
-### SRT 字幕规范
-- 编码：UTF-8 强制
-- 字幕前缀：**默认**不带「<角色名>：」（用户可通过 `subtitleShowSpeakerPrefix = true` 配置项开启前缀模式）
-- 单条字幕最大字数：中文建议 ≤ 18 字 / 行，超了换行两行
-- 时间轴严格对齐 SK3 的 L 列嘴型窗口起止秒
-### TTS 语速规范
-- 中文自然朗读基准：3.5 字/秒 = 普通慢速
-- 短视频 4.0 字/秒 = 自然流畅（推荐默认）
-- 上限 4.5 字/秒：机械感强，只在超字数压缩时用
-### 剪映傻瓜手册
-- 每步：一句话说明 + 按钮路径（例：「顶部菜单 → 文字 → 导入SRT → 选 `sub-shot-1A.srt`」）
-- 零基础用户能照着点，不用懂剪辑术语
+## 2. 不做的事
 
-## 五、执行步骤
-1. 读 SK3 的 B 表每段 shot ID / 台词起止秒 / 原文 / 字数
-2. 生成 N 段 sub-shot-XX.srt（标准 SRT 序号+时间轴格式）
-3. 累计偏移时间轴生成 full-film-unified.srt
-4. 按角色+情绪分类生成 TTS 清单（角色→情绪→字数→预计时长→引擎建议）
-5. 生成剪映 7 步傻瓜教程：导入素材→拖轨道→导入字幕→导入配音→对齐→加转场→导出成片
+- 不调用 TTS 服务实际生成音频
+- 不自动操作剪映
+- 不导出最终视频文件
+
+## 3. 前置条件
+
+- `sk3_storyboard_split` 已生成可用时间轴
+- `project-base-config.md` 中的配音、模型能力和命名相关字段可读
+
+本 Skill 不要求 `sk4_prompt_generator` 先完成。
+
+## 4. 必要输入
+
+- `03_storyboard/**/storyboard-script.md`
+- `00_project-config/project-base-config.md`
+- `outputs-template.md`
+
+如果 shot ID、台词原文或起止秒缺失，应暂停。
+
+## 5. 缺项处理
+
+当出现以下情况时，应暂停并退回 `sk3_storyboard_split`：
+
+- shot ID 缺失
+- 台词原文缺失
+- 起止秒缺失
+- 时间轴无法对齐
+- 音频路线缺失，无法决定走静音、原生还是混合
+
+建议统一输出：
+
+```text
+⚠️当前步骤已暂停：后期交付包生成所需的时间轴或音频路由信息不完整。
+请先补齐分镜时间轴、台词信息和音频路线，再继续执行 sk6_postproduction_bundle。
+```
+
+## 6. 核心新增要求
+
+本 Skill 需要根据项目配置选择音频路线：
+
+1. `mute_plus_tts`
+2. `native_audio`
+3. `hybrid`
+
+同时要输出：
+
+1. 当前为什么采用这条路线
+2. 哪些镜头适合保留原生音频
+3. 哪些镜头建议回退到 TTS
+4. 剪辑阶段的连续性检查建议
+
+## 7. 执行步骤
+
+1. 读取分镜时间轴和项目配置中的音频路线
+2. 生成分段 SRT
+3. 生成全片统一 SRT
+4. 根据音频路线生成 TTS 清单、审校说明或混合方案
+5. 生成 `voice-strategy.md`
+6. 生成面向普通用户的剪映操作手册
+
+## 8. 跳步规则
+
+- 在 `sk3` 完成后，本 Skill 可直接执行
+- 不必等待 `sk4`
+- 当项目明确关闭原生台词或口型能力不足时，应优先走静音 + TTS 路线
+
+## 9. 成功判定
+
+满足以下条件时，判定为成功：
+
+1. 分段 SRT 已生成
+2. 全片统一 SRT 已生成
+3. TTS 清单已生成，或已明确标记当前不启用
+4. `voice-strategy.md` 已生成
+5. 剪映操作手册已生成
+
+建议成功输出：
+
+```text
+✅后期交付包已生成，可以按当前音频路线并行推进视频生成、配音与剪辑整理。
+```
+
+## 10. 失败判定
+
+出现下列情况时，判定为失败或暂停：
+
+1. 时间轴信息缺失
+2. 关键输出文件未生成
+3. 字幕或 TTS 内容与分镜台词不一致
+4. 音频路线与模型能力明显不匹配却未提示回退

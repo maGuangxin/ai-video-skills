@@ -1,12 +1,12 @@
 manifestVersion: 1.0
+
 package:
   id: ai-video-skills
-  name: AI Video Production Skills Suite
+  name: AI Video Skills Suite
   version: 1.0.0
-  description: &gt;
-    一套面向短视频 AI 生成的全流程 Skill 包。支持 6 种入口（原文/大纲/角色场景/单段片段/分镜现成/提示词现成），
-    内建通俗交互→专业术语映射层，风格可配置（写实/半写实/卡通/动漫/古风/赛博朋克），
-    串并行智能调度，主流 Agent 双模式兼容安装。
+  description: >
+    面向短视频 AI 生成流程的 Skill 包。约束核心是：先建立项目基础配置，
+    再检查缺项，之后按依赖关系执行角色、场景、分镜、提示词、审计和后期步骤。
   language: zh-CN
   author: Project Distilled Team
   license: MIT
@@ -18,6 +18,7 @@ entryMode:
 
 flowControl:
   mode: smart
+  globalPreHook: sk0b_missing_field_guide
   enforcedSerialEdges:
     - [sk0_project_init_guided, sk1_character_design]
     - [sk0_project_init_guided, sk2_scene_design]
@@ -25,93 +26,123 @@ flowControl:
     - [sk2_scene_design, sk3_storyboard_split]
     - [sk3_storyboard_split, sk4_prompt_generator]
     - [sk4_prompt_generator, sk5_consistency_audit]
+    - [sk3_storyboard_split, sk6_postproduction_bundle]
   parallelEdges:
     - [sk1_character_design, sk2_scene_design]
-    - [sk3_storyboard_split, sk6_postproduction_bundle]
     - [sk4_prompt_generator, sk6_postproduction_bundle]
-  globalPreHook: sk0b_missing_field_guide
 
 skills:
   - id: sk0_project_init_guided
-    name: 项目基础配置引导（12项Agent主动提问）
+    name: 项目基础配置引导
     version: 1.0.0
-    description: 通过 Agent 主动提问方式逐项收集 12 项全局配置，生成唯一真相源《项目基础配置表.md》。未回答完毕禁止后续 Skill 启动。
+    description: >
+      收集项目基础配置，生成 project-base-config.md 与 pending-confirmations.md。
+      核心必填项未就绪时，后续 Skill 不应启动。
     entry: skills/sk0_project_init_guided/SKILL.md
     inputsSchema: schemas/project-config.schema.json
     outputs:
       - 00_project-config/project-base-config.md
       - 00_project-config/pending-confirmations.md
     dependencies: []
+
   - id: sk0b_missing_field_guide
-    name: 缺项补全引导引擎
+    name: 缺项补全引导
     version: 1.0.0
-    description: 每个 Skill 执行前的全局 pre-hook，扫描必填槽位缺失项。缺项时不脑补不编造，生成《缺项待确认清单》主动问用户；所有不确定项统一标记 ⚠️待用户确认。
+    description: >
+      作为全局 pre-hook，在每一步前检查关键输入是否缺失。
+      缺项时暂停当前步骤，写入 pending-confirmations.md，并要求用户确认。
     entry: skills/sk0b_missing_field_guide/SKILL.md
     inputsSchema: null
     outputs:
       - 00_project-config/pending-confirmations.md
-    dependencies: [sk0_project_init_guided]
+    dependencies:
+      - sk0_project_init_guided
+
   - id: sk1_character_design
-    name: 角色设定 & 风格前缀模板库
+    name: 角色设定与一致性规则
     version: 1.0.0
-    description: 按项目风格输出每个角色完整 9 章节设定 + 完整前缀模板库（单人/双人/三人同框）。写实风自动激活「完整前缀强制复制法」；其他风格降级为简化前缀。
+    description: >
+      基于项目配置输出角色设定文档与 character-consistency-rules.md，
+      为后续分镜和提示词提供可复用的角色真相源。
     entry: skills/sk1_character_design/SKILL.md
     inputsSchema: schemas/character.schema.json
     outputs:
-      - 01_character-design/docs/角色_&lt;角色名&gt;_完整设定.md
+      - 01_character-design/docs/char-<char-id>-full-design.md
       - 01_character-design/docs/character-consistency-rules.md
-    dependencies: [sk0_project_init_guided]
+    dependencies:
+      - sk0_project_init_guided
+
   - id: sk2_scene_design
-    name: 场景设定 & 统一视觉规范
+    name: 场景设定与统一视觉规范
     version: 1.0.0
-    description: 按风格输出每个场景 8 章节设定 + 全局统一视觉规范库。写实风自动激活「家具参照物锚点法（床74/书桌96/门把手125cm）」。
+    description: >
+      基于项目配置输出场景设定文档和 unified-visual-spec.md，
+      为分镜和提示词提供统一场景依据。
     entry: skills/sk2_scene_design/SKILL.md
     inputsSchema: schemas/scene.schema.json
     outputs:
-      - 02_scene-design/docs/场景_&lt;场景名&gt;_完整设定.md
+      - 02_scene-design/docs/scene-<scene-id>-full-design.md
       - 00_project-config/unified-visual-spec.md
-    dependencies: [sk0_project_init_guided]
+    dependencies:
+      - sk0_project_init_guided
+
   - id: sk3_storyboard_split
-    name: 分镜拆分 &amp; 四维对齐（智能分段）
+    name: 分镜拆分与时间轴整理
     version: 1.0.0
-    description: 单段剧情直接输出单段；多段剧情按「爆点不跨段/台词不截断/自然动作断点/长台词独占」4 原则拆分。交付 3 件套：分镜脚本+首尾帧约束+四维对齐表（V视频/A动作/L嘴型/TTS耗时）。
+    description: >
+      生成分镜脚本、首尾帧约束和 shot 目录。
+      若输入为现成分镜，可按统一结构整理；若输入为剧情，则按约束拆分。
     entry: skills/sk3_storyboard_split/SKILL.md
     inputsSchema: schemas/storyboard.schema.json
     outputs:
-      - 03_storyboard/storyboard-&lt;ID&gt;_&lt;语义名&gt;/storyboard-script.md
-      - 03_storyboard/storyboard-&lt;ID&gt;_&lt;语义名&gt;/keyframe-constraints.md
-      - 03_storyboard/storyboard-&lt;ID&gt;_&lt;语义名&gt;/shot-&lt;ID&gt;_&lt;语义名&gt;/（空目录）
-    dependencies: [sk1_character_design, sk2_scene_design]
+      - 03_storyboard/storyboard-<id>-<semantic>/storyboard-script.md
+      - 03_storyboard/storyboard-<id>-<semantic>/keyframe-constraints.md
+      - 03_storyboard/storyboard-<id>-<semantic>/shot-<id>-<semantic>/
+    dependencies:
+      - sk1_character_design
+      - sk2_scene_design
+
   - id: sk4_prompt_generator
-    name: 提示词批量生成（核心·风格化3大技术开关）
+    name: 提示词生成
     version: 1.0.0
-    description: 按风格配置激活对应技术。写实风格默认开启：写实3次夹攻法+完整前缀强制复制法+百分比特权锚点法+口型6正7禁精确到秒段+6大类负向词。其他风格自动切换专属模板。
+    description: >
+      基于分镜、角色和场景真相源生成每段 video-prompt.md。
+      提示词中的角色前缀、动作与时间轴应与前置产物保持一致。
     entry: skills/sk4_prompt_generator/SKILL.md
     inputsSchema: schemas/prompt.schema.json
     outputs:
-      - 03_storyboard/storyboard-&lt;ID&gt;/shot-&lt;ID&gt;/video-prompt.md
-    dependencies: [sk3_storyboard_split]
+      - 03_storyboard/storyboard-<id>-<semantic>/shot-<id>-<semantic>/video-prompt.md
+    dependencies:
+      - sk3_storyboard_split
+
   - id: sk5_consistency_audit
-    name: 一致性校验 &amp; 四档打标
+    name: 一致性校验
     version: 1.0.0
-    description: 6步检查清单按风格动态调整（写实12死禁/卡通8禁）。交付《项目生产进度总览.md》，每项打 4 档状态：✅通过/⏳待生产/❌缺失/⚠️待确认。
+    description: >
+      汇总角色、场景、分镜、提示词与后续生产状态，
+      生成 project-production-progress.md，并输出下一步建议。
     entry: skills/sk5_consistency_audit/SKILL.md
     inputsSchema: null
     outputs:
       - 00_project-config/project-production-progress.md
-    dependencies: [sk4_prompt_generator]
+    dependencies:
+      - sk4_prompt_generator
+
   - id: sk6_postproduction_bundle
-    name: 字幕 / TTS配音 / 剪映模板批量生成
+    name: 后期交付包生成
     version: 1.0.0
-    description: 从分镜时间轴自动生成 N 段 SRT + 全片统一 SRT + TTS 配音清单 + 剪映傻瓜手册。默认字幕不带角色名前缀（可通过配置开关开启）。
+    description: >
+      基于分镜时间轴生成 SRT、TTS 清单和剪映操作手册。
+      本步骤只依赖 sk3 的时间轴信息，可在 sk4 完成前启动。
     entry: skills/sk6_postproduction_bundle/SKILL.md
     inputsSchema: schemas/storyboard.schema.json
     outputs:
-      - 05_final-deliverables/subtitles/shot-&lt;ID&gt;.srt
+      - 05_final-deliverables/subtitles/sub-shot-<id>.srt
       - 05_final-deliverables/subtitles/full-film-unified.srt
       - 05_final-deliverables/tts/tts-voiceover-full.md
       - 05_final-deliverables/tutorials/jianying-step-by-step.md
-    dependencies: [sk3_storyboard_split]
+    dependencies:
+      - sk3_storyboard_split
 
 projectSkeleton:
   templatePath: templates/project-skeleton

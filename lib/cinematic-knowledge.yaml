@@ -1,5 +1,5 @@
 knowledgeVersion: 1.0
-description: &gt;
+description: >
   通俗交互 → 专业电影术语映射层。用户全程回答「上半身/左边/暖光/电影感」这种人话，
   Agent 内部自动把专业术语写入所有产物（提示词/分镜脚本/首尾帧约束/视觉规范），
   用户完全不需要懂这些专业词汇，直接提升 AI 视频生成质量 30%+。
@@ -112,7 +112,7 @@ cameraLens:
       lens: 35mm f/5.6 General Purpose
       projection: Spherical native 9:16 / 16:9
       depthOfField: Moderate deep, entire subject sharp + background still legible
-      distortion: Barrel &lt; 0.5%
+      distortion: Barrel < 0.5%
     "宏大环境广角视野":
       lens: 24mm f/8 Wide Angle
       projection: Spherical native
@@ -151,7 +151,7 @@ colorGrading:
     "好莱坞橙青对比（电影感默认首选）":
       colorSpace: Rec.709 Broadcast
       gamma: 2.4 (Cinema Standard Dark Environment)
-      palette: Teal &amp; Orange Hollywood Contrast LUT, shadows teal, midtones natural, highlights orange-warm
+      palette: Teal & Orange Hollywood Contrast LUT, shadows teal, midtones natural, highlights orange-warm
     "温暖日系柔和":
       colorSpace: Rec.709
       gamma: 2.2

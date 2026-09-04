@@ -1,52 +1,77 @@
-# storyboard-script.md（分镜脚本完整模板 · 含一B四维对齐总表）
-
----
+# storyboard-script.md
 
 ## A. 分镜基本信息
-- 分镜 ID：storyboard-<N>
-- 分镜语义名：<例：balcony-night-opening>
-- 场景：scene-<ID>
-- 出场角色：char-A / char-B / char-C（如有）
+- 分镜 ID：
+- 分镜语义名：
+- 场景：
+- 出场角色：
 - 分镜总秒数：
-- 拆分段数：<N> 段（每段 ≤ <singleShotMaxSeconds>s）
+- 拆分段数：
+- 推荐生产模式：
+- 实际拆镜依据：
 
----
-
-## B. 四维对齐总表（SK3 核心交付物）
-
-| shot ID | 语义名 | V 视频时长(s) | A 动作时间戳(起→止:描述) | L 嘴型窗口(s→s / 最大字数) | 台词原文 | 字数 | TTS 耗时=字数÷4（s） | 首帧嘴状态 | 尾帧嘴状态 | 爆点？不切中间？ |
+## B. 四维对齐总表
+| shot ID | 语义名 | 视频时长 | 动作时间轴 | 嘴型窗口 | 台词原文 | 字数 | TTS 预估时长 | 首帧嘴状态 | 尾帧嘴状态 | 备注 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| shot-1A | balcony-taivy-wave | 10 | 0→2:阳台远景推近 / 2→7:女主微笑挥手 / 7→10:镜头固定定格 | 4→6 / 8字 | "你可算来了" | 4 | 1.0s | 微笑闭嘴 | 闭嘴笑 | 否 |
-| shot-1B | marcus-entry-long-line | 10 | 0→1:男主推门进 / 1→8:男主走近长台词 / 8→10:站定看女主 | 1→9 / 32字 | "<32字以内长台词独占整段>" | 30 | 7.5s | 张嘴说第1字 | 说完闭 | 否 |
-| shot-3A | skirt-flip-explosion | 10 | 0→5:女主靠近 / 5→9:裙摆掀起爆点 / 9→10:男主惊呆表情 | 5→9 / 16字（爆点台词不超长）| "<爆点短台词>" | 14 | 3.5s | 暧昧微笑 | 惊呆张嘴O型 | ✅是，严格不切中间 |
-| … | | | | | | | | | |
+| shot-1A | | | | | | | | | | |
+| shot-1B | | | | | | | | | | |
 
-### 四维对齐检查
-- 🔴 每段 L 列最大字数 = (窗口end - 窗口start) × 4 → 实际字数必须 ≤ 这个值
-- 🔴 每段 TTS 耗时 ≤ 窗口时长
-- 🔴 任何 爆点段 5→9 爆点中间没有切
+### 对齐检查
+- 台词字数与窗口长度是否匹配
+- TTS 预估时长是否可落在窗口内
+- 关键爆点是否保持完整
 
----
-
-## C. 逐段详细分镜脚本（每段）
+## C. shot 连续性字段
 ### shot-<ID> <semantic-name>
-- 景别（专业映射自 cinematic-knowledge）：Medium Shot 50mm f/2.8
-- 构图：Rule of Thirds 左 1/3 + 鼻尖留白 2/3
-- 光线：2700K 暖黄 Practical Lamp，45° Key，1.5:1 光比
+- shotPurpose：
+- cameraSide：
+- cameraHeight：
+- cameraDistance：
+- subjectFacing：
+- screenDirection：
+- eyelineTarget：
+- axisRelation：
+- cutReason：
+- transitionType：
+- startComposition：
+- endComposition：
+- anchorPlan：
+  - start_frame_anchor：
+  - end_frame_anchor：
+  - action_peak_anchor：
+  - emotion_peak_anchor：
+  - prop_continuity_anchor：
+- forbiddenDrift：
+
+## D. 逐段分镜脚本
+### shot-<ID> <semantic-name>
+- 景别：
+- 构图：
+- 光线：
 - 动作时间轴：
-  1. 0.0-2.5s：<动作描述>
-  2. 2.5-8.0s：<动作+台词>
-  3. 8.0-10.0s：<收尾动作>
-- 台词原文（逐字，不改写）：<……>
-- 口型时间戳：2.5 秒起，8.0 秒止，精确到 0.5 秒
+  1. `<时间段 + 动作>`
+  2. `<时间段 + 动作>`
+  3. `<时间段 + 动作>`
+- 台词原文：
+- 口型时间段：
 
----
-
-## D. 跨段首尾帧嘴状态衔接总表
-防止跳切嘴型翻车
-
-| 上一段尾 shot ID | 尾帧嘴状态 | → 下一段首 shot ID | 首帧嘴状态 | 衔接检查 |
+## E. 跨段衔接表
+### E1. 动作衔接
+| 上一段 | 尾动作 | 下一段 | 首动作 | 备注 |
 |---|---|---|---|---|
-| shot-1A | 微笑闭嘴 | shot-1B | 男主张嘴说话 | ✅ 衔接没问题 |
-| shot-2 | 塔薇笑 | shot-3A | 暧昧笑 | ✅ 没有跨段闭嘴 |
-| … | | | | |
+| shot-1A | | shot-1B | | |
+
+### E2. 视线衔接
+| 上一段 | 尾视线 | 下一段 | 首视线 | 备注 |
+|---|---|---|---|---|
+| shot-1A | | shot-1B | | |
+
+### E3. 空间衔接
+| 上一段 | 尾空间关系 | 下一段 | 首空间关系 | 备注 |
+|---|---|---|---|---|
+| shot-1A | | shot-1B | | |
+
+### E4. 情绪衔接
+| 上一段 | 尾情绪 | 下一段 | 首情绪 | 备注 |
+|---|---|---|---|---|
+| shot-1A | | shot-1B | | |

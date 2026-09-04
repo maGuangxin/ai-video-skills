@@ -1,5 +1,5 @@
 presetsVersion: 1.0
-activationRulesDescription: &gt;
+activationRulesDescription: >
   用户在 SK-0 配置阶段选择一个 artStyle，系统自动激活该风格对应的 3 大核心技术开关矩阵（写实3次夹攻/完整前缀强制复制/百分比特权锚点+家具锚点）。
   矩阵中的 boolean=false 表示该风格不强制激活该技术（例如卡通风通常不强制家具真实厘米数），但用户仍可在 SK-0b 缺项引导中手动强制开启。
 

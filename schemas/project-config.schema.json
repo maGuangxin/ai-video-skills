@@ -120,7 +120,91 @@
     "namingConvention": {
       "type": "string",
       "enum": ["english-semantic", "mixed-cn-en-ids", "english-ids-only"],
-      "default": "english-semantic"
+      "default": "english-semantic",
+      "description": "兼容旧版字段。建议结合 namingPolicy 使用；不得仅凭该字段粗略决定所有目录名、文件名和图片名。"
+    },
+    "namingPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "businessPathLanguage",
+        "artifactFileLanguage",
+        "internalIdentifierLanguage"
+      ],
+      "properties": {
+        "businessPathLanguage": {
+          "type": "string",
+          "enum": ["zh-CN", "en-US", "mixed"],
+          "description": "业务目录路径语言。项目业务目录应跟随当前项目语言环境，而不是默认英文。"
+        },
+        "artifactFileLanguage": {
+          "type": "string",
+          "enum": ["zh-CN", "en-US", "mixed"],
+          "description": "业务产物文件名语言，包括图片名、说明文档名和验证产物名。"
+        },
+        "internalIdentifierLanguage": {
+          "type": "string",
+          "enum": ["en-US"],
+          "description": "Skill ID、schema 字段、类型名、API 名等内部标识统一保持英文。"
+        }
+      }
+    },
+    "skillInstallPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mustInstallToProjectRoot",
+        "requireTraeCheck"
+      ],
+      "properties": {
+        "mustInstallToProjectRoot": {
+          "type": "boolean",
+          "description": "若为 true，则不能只生成业务目录骨架，还必须检查项目根目录 .trae 安装态。"
+        },
+        "requireTraeCheck": {
+          "type": "boolean",
+          "description": "若为 true，则 sk0 必须检查 .trae/whoIam.md、.trae/skills、.trae/rules。"
+        }
+      }
+    },
+    "providerCapabilityProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "credentialStatus": {
+          "type": "string",
+          "enum": ["available", "missing", "unverified"]
+        },
+        "textToImage": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        },
+        "imageToImage": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        },
+        "imageConditionedVideo": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        },
+        "identityConsistency": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        },
+        "multiReferenceFusion": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        },
+        "showcasePackSupport": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        },
+        "referencePackSupport": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "unverified"]
+        }
+      },
+      "description": "provider capability preflight 结果。若 identityConsistency 或 multiReferenceFusion 未验证或不支持，不得把生成图片宣称为可稳定约束人物的 reference_pack。"
     },
     "tempCleanupMode": {
       "type": "string",
