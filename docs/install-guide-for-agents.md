@@ -1,9 +1,9 @@
 # 安装指南
 
-本文档只回答 4 个问题：
+本文档只回答 5 个问题：
 
 1. 如何把 `ai-video-skills/` 放到项目里
-2. 如何把 Skill 安装到项目根目录 `.trae`
+2. 如何根据不同 IDE / Agent 选择安装模式
 3. 哪种接入方式更稳
 4. 第一次应该怎么验证
 5. 失败时先排查什么
@@ -29,13 +29,19 @@ git submodule update --init --recursive
 
 把解压后的目录命名为 `ai-video-skills/`，放在项目根目录。
 
-## 2. 项目根目录安装闭环
+## 2. 按 IDE / Agent 选择安装模式
 
-如果你的目标是“让当前项目在 IDE 里直接感知 Skill”，不要停在“仓库放进来了”，还要把 Skill 同步到项目根目录 `.trae/`。
+如果你的目标是“让当前项目在 IDE 里直接感知 Skill”，不要先假设所有 IDE 都走 `.trae/`。正确顺序是：
 
-推荐顺序：
+1. 先识别当前 IDE / Agent 类型
+2. 再判断它支持哪种安装模式
+3. 最后检查对应目录或降级方案
 
-### 2.1 macOS / Linux
+当前仓库目前支持 3 种模式：
+
+### 2.1 Trae：项目级 `.trae/`
+
+如果当前 IDE 是 Trae，可使用本仓库已提供的脚本闭环。
 
 假设目录结构是：
 
@@ -63,15 +69,33 @@ ai-video-skills\apply-trae.bat apply
 ai-video-skills\apply-trae.bat check
 ```
 
-### 2.3 check 通过的最小标准
-
-满足下面 5 条才算“项目根目录安装态成立”：
+Trae 模式下，满足下面 5 条才算“项目级安装态成立”：
 
 1. `<project-root>/.trae/` 存在
 2. `<project-root>/.trae/whoIam.md` 存在
 3. `<project-root>/.trae/skills/` 存在
 4. `<project-root>/.trae/rules/` 存在
 5. `<project-root>/.trae/skills.manifest.yaml` 存在
+
+### 2.2 其他 IDE / Agent：项目级目录按官方文档
+
+如果当前 IDE / Agent 也支持项目级 Skill 目录，但目录名、配置文件名或刷新方式与 Trae 不同：
+
+1. 不要硬套 `.trae`
+2. 先按该 IDE / Agent 官方文档确认项目级目录
+3. 记录对应目录、配置文件和刷新方式
+4. 再检查其是否已安装完成
+
+当前仓库**不对其他 IDE 的项目级目录做硬编码**，以避免编造不存在的目录规则。
+
+### 2.3 不支持项目级安装：仓库旁路 + 手动读取
+
+如果当前 IDE / Agent 不支持项目级安装：
+
+1. 保留完整的 `ai-video-skills/` 仓库目录
+2. 不宣称 IDE 已项目级感知该 Skill
+3. 改为手动让 Agent 读取 `skills/*/SKILL.md`
+4. 这种模式下安装态结果应记录为 `manual-fallback`
 
 ## 3. 接入方式分层
 
@@ -124,7 +148,7 @@ ai-video-skills\apply-trae.bat check
 满足下面 4 条即可认为安装基本成功：
 
 1. 工作区中存在完整的 `ai-video-skills/`
-2. 若目标是项目内安装，则 `.trae` check 已通过
+2. 若目标是项目内安装，则当前 IDE / Agent 对应安装态检查已通过，或已明确降级为 `manual-fallback`
 3. Agent 至少能稳定读取 `skills/*/SKILL.md`
 4. 能跑通 `examples/quickstart-cafe-scene/walkthrough.md` 的单段 smoke test
 
@@ -153,15 +177,16 @@ ai-video-skills\apply-trae.bat check
 ### 步骤
 
 1. 确认 `ai-video-skills/` 目录完整
-2. 如果目标是项目内安装，先执行 `init -> apply -> check`
-3. 打开 `examples/quickstart-cafe-scene/walkthrough.md`
-4. 让 Agent 按其中的单段示例依次执行 `sk0` 到 `sk6`
-5. 最后检查 `sk5` 是否能输出明确状态
+2. 如果目标是 Trae 项目内安装，先执行 `init -> apply -> check`
+3. 如果目标是其他 IDE 项目内安装，先按官方文档确认目录与检查方式
+4. 打开 `examples/quickstart-cafe-scene/walkthrough.md`
+5. 让 Agent 按其中的单段示例依次执行 `sk0` 到 `sk6`
+6. 最后检查 `sk5` 是否能输出明确状态
 
 ### 看到这些结果就算通过
 
 - `00_project-config/project-base-config.md` 已生成
-- 如果目标是项目内安装，`.trae` 检查通过
+- 如果目标是项目内安装，当前 IDE / Agent 对应安装态检查通过，或已明确记录 `manual-fallback`
 - `03_storyboard/` 下出现分镜与 shot 目录
 - `video-prompt.md`、SRT、TTS 清单、进度总览能按规则生成
 - 缺项时 Agent 会暂停确认，而不是直接脑补
@@ -178,8 +203,9 @@ ai-video-skills\apply-trae.bat check
 如果没有成功加载，按这个顺序排查：
 
 1. 仓库目录是否完整
-2. 若目标是项目内安装，`.trae` 是否已执行 `init / apply / check`
-3. Agent 是否至少能读取 `SKILL.md`
-4. 是否误以为 manifest 一定会被自动加载
-5. 是否直接跳过了 `sk0` 或 `sk0b`
-6. smoke test 是否先在单段示例上跑通
+2. 若目标是 Trae 项目内安装，`.trae` 是否已执行 `init / apply / check`
+3. 若目标是其他 IDE 项目内安装，是否已按官方文档确认对应目录和刷新方式
+4. Agent 是否至少能读取 `SKILL.md`
+5. 是否误以为 manifest 一定会被自动加载
+6. 是否直接跳过了 `sk0` 或 `sk0b`
+7. smoke test 是否先在单段示例上跑通

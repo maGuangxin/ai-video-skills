@@ -14,13 +14,15 @@
 ## 二、项目级安装策略
 | 字段 | 值 | 说明 |
 |---|---|---|
-| 是否要求安装到项目根目录 | `<true / false / ⚠️待用户确认>` | 若为 `true`，后续必须检查 `.trae` |
-| `.trae` 安装方式 | `<copy / apply-script / check-first / ⚠️待用户确认>` | |
-| `.trae` 安装态检查结果 | `<passed / missing / partial / ⚠️待用户确认>` | |
-| `.trae/whoIam.md` | `<exists / missing>` | |
-| `.trae/skills` | `<exists / missing>` | |
-| `.trae/rules` | `<exists / missing>` | |
-| 是否已执行 `apply / check` | `<yes / no / ⚠️待用户确认>` | |
+| 当前 IDE / Agent 类型 | `<trae / generic-ide / unsupported-project-install / unknown>` | 先识别环境，再决定安装目录 |
+| 是否要求安装到项目根目录 | `<true / false / ⚠️待用户确认>` | 若为 `true`，后续必须检查对应安装模式 |
+| 安装模式 | `<trae-project-level / ide-project-level / repository-adjacent-manual / ⚠️待用户确认>` | |
+| 安装检查目标路径 | `<具体路径 / 按 IDE 官方文档 / 不适用>` | |
+| 项目级安装态检查结果 | `<passed / missing / partial / manual-fallback / ⚠️待用户确认>` | |
+| Trae 检查项 | `<.trae / whoIam.md / skills / rules / manifest>` | 仅 Trae 模式必填 |
+| 通用 IDE 检查项 | `<对应目录 / 配置文件 / 刷新方式>` | 仅 `ide-project-level` 模式必填 |
+| 是否已执行安装或检查 | `<yes / no / ⚠️待用户确认>` | |
+| 自动化安装支持 | `<trae-script / manual-only / ⚠️待用户确认>` | 目前只有 Trae 提供脚本闭环 |
 
 ## 三、模型能力画像
 | 字段 | 值 | 说明 |
@@ -112,7 +114,7 @@
 ## 十二、校验结论
 - 已填项：`<X>`
 - 待确认项：`<Y>`
-- `.trae` 安装态：`<passed / missing / partial / ⚠️待用户确认>`
+- 项目级安装态：`<passed / missing / partial / manual-fallback / ⚠️待用户确认>`
 - provider capability preflight：`<passed / blocked / partial>`
 - 推荐生产模式：`<safe / balanced / expressive>`
 - 推荐音频路线：`<mute_plus_tts / native_audio / hybrid>`

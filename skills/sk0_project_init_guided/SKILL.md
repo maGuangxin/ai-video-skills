@@ -10,7 +10,7 @@
 2. `00_project-config/pending-confirmations.md`
 3. 项目目录骨架应用到项目根目录
 4. 模型能力画像与推荐生产路线
-5. 项目级 Skill 安装态检查结果（`.trae`）
+5. 项目级 Skill 安装态检查结果（按当前 IDE / Agent 的安装机制）
 
 ## 2. 不做的事
 
@@ -25,7 +25,7 @@
 - 无前置 Skill
 - 项目根目录可写
 - 默认使用相对路径描述产物位置
-- 如果用户目标是“在当前项目 IDE 中直接使用 Skill”，则项目根目录必须允许创建或更新 `.trae/`
+- 如果用户目标是“在当前项目 IDE 中直接使用 Skill”，则项目根目录必须允许创建或更新当前 IDE 对应的项目级 Skill 目录；若当前 IDE 不支持项目级安装，则必须接受旁路手动读取方案
 
 如果项目根目录不可写，应立即暂停。
 
@@ -86,13 +86,24 @@
 
 ## 6.1 项目安装态新增要求
 
-如果当前任务是“在项目内应用 Skill”，则不能只应用业务目录骨架，还必须检查项目级安装态：
+如果当前任务是“在项目内应用 Skill”，则不能只应用业务目录骨架，还必须先识别当前 IDE / Agent 的安装机制，再检查对应安装态：
 
-1. `<project-root>/.trae/` 是否存在
-2. `<project-root>/.trae/whoIam.md` 是否存在
-3. `<project-root>/.trae/skills` 是否存在
-4. `<project-root>/.trae/rules` 是否存在
-5. 是否已执行过 `sync / apply / check`，或已明确记录未执行原因
+1. 当前 IDE / Agent 类型是否已识别
+2. 当前安装模式是否已识别：`trae-project-level / ide-project-level / repository-adjacent-manual`
+3. 若为 `trae-project-level`：
+   - `<project-root>/.trae/` 是否存在
+   - `<project-root>/.trae/whoIam.md` 是否存在
+   - `<project-root>/.trae/skills` 是否存在
+   - `<project-root>/.trae/rules` 是否存在
+   - 是否已执行过 `init / apply / check`
+4. 若为 `ide-project-level`：
+   - 是否已根据该 IDE 官方文档定位项目级 Skill 目录
+   - 对应目录、配置文件和刷新方式是否已记录
+   - 安装检查结果是否已记录为 `passed / missing / partial`
+5. 若为 `repository-adjacent-manual`：
+   - 是否已明确当前 IDE 不支持项目级安装
+   - 是否已改走“仓库旁路 + 手动读取 SKILL.md”方案
+   - 是否已记录为什么不能宣称 IDE 已项目级感知该 Skill
 
 若上述条件不成立，不得宣称“Skill 已安装到当前项目并可被 IDE 直接感知”。
 
@@ -113,7 +124,7 @@
 ## 7. 执行步骤
 
 1. 从 `templates/project-skeleton/` 应用目录骨架到项目根目录
-2. 如果用户目标包含 IDE 项目内使用，检查 `.trae` 安装态并记录缺失项
+2. 如果用户目标包含 IDE 项目内使用，先识别 IDE / Agent 类型与安装模式，再检查对应安装态并记录缺失项
 3. 按 `prompts.md` 中的顺序逐项提问，不要一次抛出全部问题
 4. 将用户确认过的内容结构化写入 `project-base-config.md`
 5. 将未确认或不明确的项写入 `pending-confirmations.md`
@@ -135,7 +146,7 @@
 3. 模型能力画像已建立
 4. 已给出推荐生产模式与音频路线
 5. 目录骨架已应用
-6. 如果用户目标包含项目内使用，则 `.trae` 安装态已检查并记录结果
+6. 如果用户目标包含项目内使用，则当前 IDE / Agent 对应安装态或旁路方案已检查并记录结果
 7. provider capability preflight 已完成
 
 建议成功输出：
@@ -154,7 +165,7 @@
 3. 关键字段缺失但仍试图继续后续 Skill
 4. 模型能力画像缺失
 5. 参考文件不可读
-6. 用户要求项目内安装，但 `.trae` 安装态未检查
+6. 用户要求项目内安装，但当前 IDE / Agent 对应安装态未检查
 7. 需要进入图片/视频阶段，但 provider capability preflight 缺失
 
 ## 11. 关联文件

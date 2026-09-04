@@ -1,6 +1,6 @@
 # rules / README
 
-> 本目录用于存放项目级规则文件。安装到项目根目录后，会被同步到 `<project-root>/.trae/rules/`，供 IDE 与 Agent 在项目内直接读取。
+> 本目录用于存放项目级规则文件。若当前 IDE 是 Trae，会被同步到 `<project-root>/.trae/rules/`；若是其他支持项目级安装的 IDE / Agent，则应按其官方目录放置；若不支持项目级安装，则改走仓库旁路手动读取。
 
 ## 当前规则
 

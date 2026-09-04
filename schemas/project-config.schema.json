@@ -56,7 +56,11 @@
     },
     "aspectRatio": {
       "type": "string",
-      "enum": ["9:16-vertical", "16:9-horizontal", "1:1-square"]
+      "enum": [
+        "9:16-vertical",
+        "16:9-horizontal",
+        "1:1-square"
+      ]
     },
     "singleShotMaxSeconds": {
       "type": "integer",
@@ -78,7 +82,10 @@
       ]
     },
     "customStyleDefinition": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "当 artStyle=custom-style-define-below 时必填，其余情况留 null"
     },
     "voiceoverMode": {
@@ -109,17 +116,29 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["beatName", "mustNotSplitInMiddle"],
+        "required": [
+          "beatName",
+          "mustNotSplitInMiddle"
+        ],
         "properties": {
-          "beatName": { "type": "string" },
-          "mustNotSplitInMiddle": { "type": "boolean", "const": true }
+          "beatName": {
+            "type": "string"
+          },
+          "mustNotSplitInMiddle": {
+            "type": "boolean",
+            "const": true
+          }
         }
       },
       "description": "核心爆点名场面（掀裙/圣光/召唤/告白等），拆分镜第一优先级：不允许在动作中间切段"
     },
     "namingConvention": {
       "type": "string",
-      "enum": ["english-semantic", "mixed-cn-en-ids", "english-ids-only"],
+      "enum": [
+        "english-semantic",
+        "mixed-cn-en-ids",
+        "english-ids-only"
+      ],
       "default": "english-semantic",
       "description": "兼容旧版字段。建议结合 namingPolicy 使用；不得仅凭该字段粗略决定所有目录名、文件名和图片名。"
     },
@@ -134,17 +153,27 @@
       "properties": {
         "businessPathLanguage": {
           "type": "string",
-          "enum": ["zh-CN", "en-US", "mixed"],
+          "enum": [
+            "zh-CN",
+            "en-US",
+            "mixed"
+          ],
           "description": "业务目录路径语言。项目业务目录应跟随当前项目语言环境，而不是默认英文。"
         },
         "artifactFileLanguage": {
           "type": "string",
-          "enum": ["zh-CN", "en-US", "mixed"],
+          "enum": [
+            "zh-CN",
+            "en-US",
+            "mixed"
+          ],
           "description": "业务产物文件名语言，包括图片名、说明文档名和验证产物名。"
         },
         "internalIdentifierLanguage": {
           "type": "string",
-          "enum": ["en-US"],
+          "enum": [
+            "en-US"
+          ],
           "description": "Skill ID、schema 字段、类型名、API 名等内部标识统一保持英文。"
         }
       }
@@ -153,17 +182,55 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "mustInstallToProjectRoot",
-        "requireTraeCheck"
+        "currentIdeType",
+        "installMode",
+        "requireProjectLevelCheck"
       ],
       "properties": {
+        "currentIdeType": {
+          "type": "string",
+          "enum": [
+            "trae",
+            "generic-ide",
+            "unsupported-project-install",
+            "unknown"
+          ],
+          "description": "当前 IDE / Agent 类型。必须先识别环境，再决定安装目录或旁路方案。"
+        },
+        "installMode": {
+          "type": "string",
+          "enum": [
+            "trae-project-level",
+            "ide-project-level",
+            "repository-adjacent-manual",
+            "unknown"
+          ],
+          "description": "安装模式。Trae 使用 .trae；其他支持项目级安装的 IDE 按官方文档；不支持项目级安装时改走仓库旁路手动读取。"
+        },
+        "requireProjectLevelCheck": {
+          "type": "boolean",
+          "description": "若为 true，则 sk0 必须检查当前 IDE / Agent 对应的项目级安装态；若当前 IDE 不支持项目级安装，则必须明确记录 manual-fallback。"
+        },
+        "projectLevelCheckTarget": {
+          "type": "string",
+          "description": "当前 IDE / Agent 的项目级安装检查目标路径或说明。对非 Trae IDE 不得编造目录，应引用官方文档。"
+        },
+        "automationSupport": {
+          "type": "string",
+          "enum": [
+            "trae-script",
+            "manual-only",
+            "unknown"
+          ],
+          "description": "自动化安装支持情况。当前仓库仅为 Trae 提供脚本闭环。"
+        },
         "mustInstallToProjectRoot": {
           "type": "boolean",
-          "description": "若为 true，则不能只生成业务目录骨架，还必须检查项目根目录 .trae 安装态。"
+          "description": "兼容旧字段。建议改用 requireProjectLevelCheck；仅表达是否要求项目级安装，不再隐含 .trae。"
         },
         "requireTraeCheck": {
           "type": "boolean",
-          "description": "若为 true，则 sk0 必须检查 .trae/whoIam.md、.trae/skills、.trae/rules。"
+          "description": "兼容旧字段，仅 Trae 模式使用。对其他 IDE 不适用。"
         }
       }
     },
@@ -173,42 +240,78 @@
       "properties": {
         "credentialStatus": {
           "type": "string",
-          "enum": ["available", "missing", "unverified"]
+          "enum": [
+            "available",
+            "missing",
+            "unverified"
+          ]
         },
         "textToImage": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         },
         "imageToImage": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         },
         "imageConditionedVideo": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         },
         "identityConsistency": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         },
         "multiReferenceFusion": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         },
         "showcasePackSupport": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         },
         "referencePackSupport": {
           "type": "string",
-          "enum": ["supported", "unsupported", "unverified"]
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
         }
       },
       "description": "provider capability preflight 结果。若 identityConsistency 或 multiReferenceFusion 未验证或不支持，不得把生成图片宣称为可稳定约束人物的 reference_pack。"
     },
     "tempCleanupMode": {
       "type": "string",
-      "enum": ["per-stage-suggestion-list", "per-stage-reminder-only", "end-of-project-once"]
+      "enum": [
+        "per-stage-suggestion-list",
+        "per-stage-reminder-only",
+        "end-of-project-once"
+      ]
     },
     "projectRootAbsolutePath": {
       "type": "string"
