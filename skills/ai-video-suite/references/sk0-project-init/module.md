@@ -64,7 +64,7 @@
 ## 9. 执行步骤
 
 1. 如用户提供了文本文件 / 图片 / 图文 / URL 等素材，先按 `references/input-ingestion.md` 归一化落盘并登记 input-manifest.md；图片反推与抓取内容作为待确认素材，访谈时逐项向用户确认
-2. 应用 `templates/project-skeleton/` 目录骨架到项目根目录
+2. 应用 `templates/project-skeleton/` 目录骨架到项目根目录——把骨架**内部的** `00_project-config/`、`01_character-design/` 等子目录复制到项目根目录下；**不要把 `project-skeleton` 目录本身嵌套进项目根**（如项目根出现 `project-skeleton/` 即为操作错误，须将其内容上移一层）
 3. 按第 5 节分组访谈（或 smoke test 快速模式）；已有素材能回答的问题先复述请用户确认，不重复提问
 4. 确认过的内容写入 project-base-config.md；未确认项写入 pending-confirmations.md
 5. 对照 `schemas/project-config.schema.json` 的 required 字段判断是否达到继续条件
