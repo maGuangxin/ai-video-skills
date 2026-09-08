@@ -1,0 +1,61 @@
+presetsVersion: 1.0
+# 用途：用户答"不确定/按保守值"时的模型能力画像兜底档位。
+# 规则：预设值写入配置表时必须标注"来自预设，未经用户确认"，用户后续可覆盖。
+# 数值状态：以下均为保守假设（未实测验证）；有实测数据后应更新并去掉未验证标注。
+
+presets:
+  doubao-standard-10s:
+    displayName: 豆包端标准会员（保守档）
+    singleShotHardMaxSeconds: 10
+    singleShotStableSeconds: 6
+    nativeAudio: false
+    nativeDialogue: false
+    lipSyncLevel: rough
+    identityConsistency: low
+    multiShotContinuity: low
+    referenceImage: unverified
+    firstLastFrame: unverified
+    recommendedMode: safe
+    recommendedAudioRoute: mute_plus_tts
+
+  jimeng-premium-20s:
+    displayName: 即梦满血版（保守档）
+    singleShotHardMaxSeconds: 20
+    singleShotStableSeconds: 10
+    nativeAudio: true
+    nativeDialogue: partial
+    lipSyncLevel: rough
+    identityConsistency: medium
+    multiShotContinuity: medium
+    referenceImage: supported
+    firstLastFrame: supported
+    recommendedMode: balanced
+    recommendedAudioRoute: hybrid
+
+  seedance-api-custom:
+    displayName: Seedance API 自定义（保守档）
+    singleShotHardMaxSeconds: 15
+    singleShotStableSeconds: 8
+    nativeAudio: unverified
+    nativeDialogue: unverified
+    lipSyncLevel: unverified
+    identityConsistency: unverified
+    multiShotContinuity: unverified
+    referenceImage: unverified
+    firstLastFrame: supported
+    recommendedMode: safe
+    recommendedAudioRoute: mute_plus_tts
+
+  unknown-conservative:
+    displayName: 未知模型通用保守档
+    singleShotHardMaxSeconds: 10
+    singleShotStableSeconds: 5
+    nativeAudio: false
+    nativeDialogue: false
+    lipSyncLevel: unsupported
+    identityConsistency: unverified
+    multiShotContinuity: low
+    referenceImage: unverified
+    firstLastFrame: unverified
+    recommendedMode: safe
+    recommendedAudioRoute: mute_plus_tts

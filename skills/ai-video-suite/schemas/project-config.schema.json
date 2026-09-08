@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/project-config.schema.json",
+  "title": "AI Video Project Base Config (agent-guided interview, 19 questions in 4 groups)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "entryType",
+    "targetPlatform",
+    "aspectRatio",
+    "singleShotMaxSeconds",
+    "artStyle",
+    "voiceoverMode",
+    "characterRoster",
+    "sceneRoster",
+    "keyBeats",
+    "namingPolicy",
+    "tempCleanupMode",
+    "projectSemanticName"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "2.0.0"
+    },
+    "entryType": {
+      "type": "string",
+      "enum": [
+        "full-source-novel",
+        "story-outline-only",
+        "chars-scenes-core-beat",
+        "single-shot-fragment",
+        "prebuilt-storyboard-lines",
+        "prebuilt-prompts-only-audit"
+      ],
+      "enumDescriptions": [
+        "① 完整故事原文（长篇小说/短篇完整剧情）",
+        "② 剧情大纲（多条剧情节点无完整原文）",
+        "③ 角色清单 + 场景清单 + 核心剧情爆点（1~N段）",
+        "④ 单段剧情片段（10~30秒，仅1段台词+动作）",
+        "⑤ 分镜脚本+台词时间轴已写好，只跑后续流程",
+        "⑥ 视频提示词已写好，只想做一致性校验+字幕TTS"
+      ]
+    },
+    "targetPlatform": {
+      "type": "string",
+      "enum": [
+        "doubao-standard-10s",
+        "jimeng-premium-20s",
+        "seedance-api-custom",
+        "other-platform-tbd"
+      ],
+      "description": "目标平台档位。各档位的保守默认画像见 lib/model-capability-presets.yaml；单段秒数等能力以该文件与用户实测为准"
+    },
+    "aspectRatio": {
+      "type": "string",
+      "enum": [
+        "9:16-vertical",
+        "16:9-horizontal",
+        "1:1-square"
+      ]
+    },
+    "publishPlatform": {
+      "type": "string",
+      "enum": [
+        "douyin",
+        "weixin-channels",
+        "kuaishou",
+        "xiaohongshu",
+        "bilibili",
+        "other-tbd"
+      ],
+      "description": "发布平台（成品分发目标，区别于视频生成模型平台 targetPlatform）。影响字幕安全区、标题文案风格与发布包适配。可选字段；未确认时标记待确认，不补默认值。"
+    },
+    "singleShotMaxSeconds": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 60,
+      "description": "单段视频硬上限秒数（豆包标准=10，即梦满血=20，API可自定义）"
+    },
+    "artStyle": {
+      "type": "string",
+      "enum": [
+        "cinematic-realistic-3d",
+        "semi-realistic-game-cg",
+        "us-cartoon",
+        "jp-anime",
+        "chinese-gufeng-handpaint",
+        "cyberpunk-neon",
+        "sci-fi-realistic",
+        "custom-style-define-below"
+      ]
+    },
+    "customStyleDefinition": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "当 artStyle=custom-style-define-below 时必填，其余情况留 null"
+    },
+    "voiceoverMode": {
+      "type": "string",
+      "enum": [
+        "tts-post-production",
+        "lip-sync-if-supported",
+        "subtitles-only-silent",
+        "no-dialogue-no-subtitles"
+      ]
+    },
+    "characterRoster": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "character.schema.json"
+      }
+    },
+    "sceneRoster": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "scene.schema.json"
+      }
+    },
+    "keyBeats": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "beatName",
+          "mustNotSplitInMiddle"
+        ],
+        "properties": {
+          "beatName": {
+            "type": "string"
+          },
+          "mustNotSplitInMiddle": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      },
+      "description": "核心爆点名场面（掀裙/圣光/召唤/告白等），拆分镜第一优先级：不允许在动作中间切段"
+    },
+    "namingPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "businessPathLanguage",
+        "artifactFileLanguage",
+        "internalIdentifierLanguage"
+      ],
+      "properties": {
+        "businessPathLanguage": {
+          "type": "string",
+          "enum": [
+            "zh-CN",
+            "en-US",
+            "mixed"
+          ],
+          "description": "业务目录路径语言。项目业务目录应跟随当前项目语言环境，而不是默认英文。"
+        },
+        "artifactFileLanguage": {
+          "type": "string",
+          "enum": [
+            "zh-CN",
+            "en-US",
+            "mixed"
+          ],
+          "description": "业务产物文件名语言，包括图片名、说明文档名和验证产物名。"
+        },
+        "internalIdentifierLanguage": {
+          "type": "string",
+          "enum": [
+            "en-US"
+          ],
+          "description": "Skill ID、schema 字段、类型名、API 名等内部标识统一保持英文。"
+        }
+      }
+    },
+    "providerCapabilityProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "credentialStatus": {
+          "type": "string",
+          "enum": [
+            "available",
+            "missing",
+            "unverified"
+          ]
+        },
+        "textToImage": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        },
+        "imageToImage": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        },
+        "imageConditionedVideo": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        },
+        "identityConsistency": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        },
+        "multiReferenceFusion": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        },
+        "showcasePackSupport": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        },
+        "referencePackSupport": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unsupported",
+            "unverified"
+          ]
+        }
+      },
+      "description": "provider capability preflight 结果。若 identityConsistency 或 multiReferenceFusion 未验证或不支持，不得把生成图片宣称为可稳定约束人物的 reference_pack。"
+    },
+    "tempCleanupMode": {
+      "type": "string",
+      "enum": [
+        "per-stage-suggestion-list",
+        "per-stage-reminder-only",
+        "end-of-project-once"
+      ]
+    },
+    "sourceInputs": {
+      "type": "array",
+      "description": "素材来源清单（input-ingestion 产物）。图片反推与网页抓取项的状态只能是 unconfirmed，经用户确认后才改为 confirmed。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "location", "parsedInto", "status"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["dialog-text", "text-file", "image", "image-plus-text", "url", "existing-project"]
+          },
+          "location": {
+            "type": "string",
+            "description": "落盘路径（99_temporary-workspace/raw-inputs/...）或来源 URL"
+          },
+          "parsedInto": {
+            "type": "string",
+            "description": "解析去向，如 sk1-character-design / story-source"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["confirmed", "unconfirmed", "failed"]
+          }
+        }
+      }
+    },
+    "projectRoot": {
+      "type": "string",
+      "description": "项目根目录，可为相对路径或绝对路径。可选字段。"
+    },
+    "projectSemanticName": {
+      "type": "string"
+    }
+  }
+}
