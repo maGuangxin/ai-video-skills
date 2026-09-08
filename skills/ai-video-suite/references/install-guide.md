@@ -46,6 +46,20 @@ git clone https://github.com/maGuangxin/ai-video-skills.git ~/.claude/skills/ai-
 # 然后把 ~/.claude/skills/ai-video-src/skills/ai-video-suite 复制或链接到 ~/.claude/skills/ai-video-suite
 ```
 
+## 方式四：豆包电脑版（GUI 上传，无目录约定）
+
+豆包不走文件系统目录，而是图形界面上传 Skill 目录或 zip 包：
+
+1. 在豆包电脑版侧边栏进入「技能·连接器·伙伴」→「我的技能」
+2. 点右上角「新建 — 上传技能」
+3. 把本仓库的 `skills/ai-video-suite/` 目录（或它的 zip 压缩包）拖入即可
+
+注意：
+
+- 若弹出的是「替换」而不是「新建」，说明装过同名旧版——先到「我的技能」里删掉旧版再上传，否则旧版不报错地覆盖不掉
+- 上传后在对话框输入 `/` 选中该技能，本轮对话才会携带它
+- 豆包端对文件系统访问有权限弹窗，首次运行时按需允许
+
 ## 接入后验证
 
 1. 对应工具的 Skill 列表中出现 `ai-video-suite`
